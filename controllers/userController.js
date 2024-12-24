@@ -63,7 +63,7 @@ const loginUser = async (req, res) => {
 // Get all users
 const getAllUsers = async (req, res) => {
 	try {
-		const users = await User.find().select('-password');
+		const users = await User.find().select('-password').select('-__v');
 		res.json(users);
 	} catch (err) {
 		res.status(500).json({ message: err.message });
@@ -73,7 +73,10 @@ const getAllUsers = async (req, res) => {
 // Get a user by ID
 const getUserById = async (req, res) => {
 	try {
-		const user = await User.findById(req.params.id).select('-password');
+		if (req.params.id !== req.user.userId) {
+			return res.status(403).json({ message: 'Not authorized to view this user' });
+		}
+		const user = await User.findById(req.params.id).select('-password').select('-__v');
 		if (!user) {
 			return res.status(404).json({ message: 'User not found' });
 		}
@@ -85,12 +88,14 @@ const getUserById = async (req, res) => {
 
 // Update a user
 const updateUser = async (req, res) => {
-	const { first_name, last_name, email } = req.body;
 
 	try {
+		if (req.params.id !== req.user.userId) {
+			return res.status(403).json({ message: 'Not authorized to update this user' });
+		}
 		const updatedUser = await User.findByIdAndUpdate(
 			req.params.id,
-			{ first_name, last_name, email },
+			req.body,
 			{ new: true } // Return the updated document
 		).select('-password');
 		if (!updatedUser) {
@@ -105,6 +110,9 @@ const updateUser = async (req, res) => {
 // Delete a user
 const deleteUser = async (req, res) => {
 	try {
+		if (req.params.id !== req.user.userId) {
+			return res.status(403).json({ message: 'Not authorized to delete this user' });
+		}
 		const deletedUser = await User.findByIdAndDelete(req.params.id);
 		if (!deletedUser) {
 			return res.status(404).json({ message: 'User not found' });

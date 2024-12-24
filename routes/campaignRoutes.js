@@ -1,4 +1,5 @@
 const express = require('express');
+const authMiddleware = require('../middleware/authMiddleware');
 const {
 	createCampaign,
 	getAllCampaigns,
@@ -9,10 +10,10 @@ const {
 
 const router = express.Router();
 
-router.post('/', createCampaign);
-router.get('/', getAllCampaigns);
-router.get('/:id', getCampaignById);
-router.put('/:id', updateCampaign);
-router.delete('/:id', deleteCampaign);
+router.post('/', authMiddleware, createCampaign);
+router.get('/', authMiddleware, getAllCampaigns);
+router.get('/:id', authMiddleware, getCampaignById);
+router.put('/:id', authMiddleware, updateCampaign);
+router.delete('/:id', authMiddleware, deleteCampaign);
 
 module.exports = router;

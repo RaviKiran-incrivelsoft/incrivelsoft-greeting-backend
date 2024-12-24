@@ -19,6 +19,22 @@ const campaignSchema = new mongoose.Schema({
 		type: Date,
 		default: Date.now,
 	},
+	media: {
+		type: {
+			type: String,
+			enum: ['image', 'video'],
+			required: true,
+		},
+		url: {
+			type: String,
+			required: true,
+		},
+	},
+	userId: {
+		type: mongoose.Schema.Types.ObjectId,
+		ref: 'User',
+		required: true,
+	},
 });
 
 module.exports = mongoose.model('Campaign', campaignSchema);
