@@ -4,13 +4,31 @@ const User = require('../models/User');
 
 // Create a new user
 const createUser = async (req, res) => {
-	const { first_name, last_name, email, password } = req.body;
+	const { first_name, last_name, email, password, confirm_password } = req.body;
 
 	try {
 		// Check if user already exists
 		const existingUser = await User.findOne({ email });
 		if (existingUser) {
 			return res.status(400).json({ message: 'Email already in use' });
+		}
+		if(confirm_password !== password)
+		{
+			return res.status(400).send({message: "Passwords are not matched..."});
+		}
+
+		const requiredFields = { first_name, last_name, email, password };
+		const missingFields = [];
+		Object.keys(requiredFields).forEach((key) => {
+			if(requiredFields[key] === undefined)
+			{
+				missingFields.push(key);
+			}
+		});
+
+		if(missingFields.length !== 0)
+		{
+			return res.status(400).send({message: `${missingFields} are required...`});
 		}
 
 		// Create new user
@@ -63,8 +81,12 @@ const loginUser = async (req, res) => {
 // Get all users
 const getAllUsers = async (req, res) => {
 	try {
-		const users = await User.find().select('-password');
-		res.json(users);
+		const {page=1, limit=10} = req.query;
+		const skip = (page - 1) * limit;
+		const users = await User.find().select('-password').skip(skip).limit(limit);
+		const totalUsers = await User.countDocuments();
+	
+		res.status(200).send({totalPages: Math.ceil(totalUsers/limit), currentPage: page,  users});
 	} catch (err) {
 		res.status(500).json({ message: err.message });
 	}
