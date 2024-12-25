@@ -12,13 +12,14 @@ export default async function sendGreetings(templeId) {
 
     const templeDetails = await getTempleData(templeId);
     console.log("templeDetails: ", templeDetails);
+    const templeImage = "uploads/santaImage.png";
 
     for (const user of templeDetails.csvUser) {
         // Constructs a JSON object templateJSON using string interpolation
         const templateJSON = JSON.stringify({
             fullName: `${user.first_name} ${user.last_name}`,
             templeBanner: `${BASE_URL}/${templeDetails.campaign.mediaURL.replace(/\\/g, '/')}`,
-            templeImage: `${BASE_URL}/${templeDetails.campaign.mediaURL.replace(/\\/g, '/')}`,
+            templeImage: `${BASE_URL}/${templeImage.replace(/\\/g, '/')}`,
             templeDescription: templeDetails.templeDescription,
             address: templeDetails.address,
             taxId: templeDetails.taxId,
