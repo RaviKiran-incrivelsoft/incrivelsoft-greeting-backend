@@ -1,4 +1,4 @@
-const Campaign = require('../models/Campaign');
+import Campaign from '../models/Campaign.js';
 
 const BASE_URL = process.env.BASE_URL || "http://localhost:5000";
 
@@ -101,10 +101,4 @@ const deleteCampaign = async (req, res) => {
 	}
 };
 
-module.exports = {
-	createCampaign,
-	getAllCampaigns,
-	getCampaignById,
-	updateCampaign,
-	deleteCampaign,
-};
+export { createCampaign, getAllCampaigns, getCampaignById, updateCampaign, deleteCampaign };
