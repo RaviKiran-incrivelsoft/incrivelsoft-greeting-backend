@@ -78,8 +78,8 @@ const watchSchedules = async () => {
 };
 
 const handleJob = async (job, isUpdate = false) => {
+    const { _id, schedule, time, temple, user } = job;
     try {
-        const { _id, schedule, time, temple, user } = job;
 
         if (schedule === 'schedule_now') {
             console.log(`Executing schedule_now for job ID: ${_id}`);
