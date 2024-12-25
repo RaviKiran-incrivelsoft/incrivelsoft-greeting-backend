@@ -80,6 +80,7 @@ const watchSchedules = async () => {
 };
 
 const handleJob = async (job, isUpdate = false) => {
+    const { _id, schedule, time, temple, user } = job;
     try {
 
         if (job.schedule === 'schedule_now') {
