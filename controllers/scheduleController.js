@@ -1,4 +1,4 @@
-import {scheduleSchema} from "../models/Schedule.js";
+import { scheduleSchema } from "../models/Schedule.js";
 
 const createSchedule = async (req, res) => {
     try {
@@ -16,7 +16,7 @@ const createSchedule = async (req, res) => {
         }
         const saveSchedule = new scheduleSchema({ schedule, time, temple, user });
         await saveSchedule.save();
-        res.status(201).send({message: `Schedule is create with id: ${saveSchedule._id}`})
+        res.status(201).send({ message: `Schedule is create with id: ${saveSchedule._id}` })
     } catch (error) {
         console.log("Error in the createSchedule, ", error);
         res.status(500).send({ error: "Internal Server error..." });
@@ -25,7 +25,7 @@ const createSchedule = async (req, res) => {
 
 const updateSchedule = async (req, res) => {
     try {
-        const { schedule, time } = req.body;
+        const { schedule, time, media } = req.body;
         const { id } = req.params;
         const fieldsToUpdate = {};
         if (schedule !== undefined) {
@@ -49,7 +49,10 @@ const getSchedules = async (req, res) => {
     try {
         const { page = 1, limit = 10 } = req.query;
         const skip = (page - 1) * limit;
-        const schedules = await scheduleSchema.find({ user: req.user.userId }).skip(skip).limit(limit);
+        const schedules = await scheduleSchema.find({ user: req.user.userId })
+            .skip(skip)
+            .limit(limit)
+            .populate('temple', 'templeName templeTitle address templeDescription websiteUrl');
         const totalSchedules = await scheduleSchema.countDocuments({ user: req.user.userId });
         res.status(200).send({ currentPage: page, totalPages: Math.ceil(totalSchedules / limit), schedules });
     } catch (error) {
