@@ -64,7 +64,7 @@ export const loginUser = async (req, res) => {
 			{ expiresIn: '1h' }
 		);
 
-		res.json({ token, userId: user._id });
+		res.json({ token, userName: `${user.first_name} ${user.last_name}` });
 	} catch (err) {
 		res.status(500).json({ message: err.message });
 	}
