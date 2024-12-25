@@ -3,6 +3,14 @@ import mongoose from 'mongoose';
 const { Schema } = mongoose;
 
 const dataSchema = new Schema({
+    templeName: {
+        type: String,
+        required: true,
+    },
+    templeTitle: {
+        type: String,
+        required: true,
+    },
     address: {
         type: String,
         required: true,

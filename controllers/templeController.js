@@ -8,6 +8,8 @@ const createTempleData = async (req, res) => {
         const { campaign } = req.query;
         const user = req.user?.userId; // Ensure user is defined
         const {
+            templeName,
+            templeTitle,
             instagramUrl,
             twitterUrl,
             facebookUrl,
@@ -20,6 +22,8 @@ const createTempleData = async (req, res) => {
         } = req.body;
 
         const requiredFields = {
+            templeName,
+            templeTitle,
             instagramUrl,
             twitterUrl,
             facebookUrl,
