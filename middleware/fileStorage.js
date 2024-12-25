@@ -1,30 +1,64 @@
-const multer = require('multer');
-const path = require('path');
-const fs = require('fs');
+import multer from "multer";
+import path from "path";
+import fs from "fs";
 
-const storeFile = (fieldName) => {
-  // Check if 'uploads' directory exists; if not, create it
-  if (!fs.existsSync('uploads')) {
-    fs.mkdirSync('uploads');
+export const configureFileUpload = (isSingle = false, fieldName = "") => {
+  // Ensure 'uploads' directory exists
+  if (!fs.existsSync("uploads")) {
+    fs.mkdirSync("uploads");
   }
 
-  // Configure Multer storage with original filename and extension
+  // Configure multer storage
   const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-      cb(null, 'uploads/'); // Destination folder
+      cb(null, "uploads/"); // Save files in the 'uploads' folder
     },
     filename: (req, file, cb) => {
-      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-      const ext = path.extname(file.originalname); // Extract the file extension
-      cb(null, file.fieldname + '-' + uniqueSuffix + ext); // Generate unique filename
+      const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+      const ext = path.extname(file.originalname); // Extract file extension
+      cb(null, file.fieldname + "-" + uniqueSuffix + ext); // Generate unique filename
     },
   });
 
-  // Create Multer instance
-  const upload = multer({ storage });
+  // Define allowed file types
+  const allowedTypes = [
+    "image/jpeg",
+    "image/png",
+    "text/csv",
+    "audio/mpeg",
+    "audio/mp3",
+    "audio/wav",
+    "video/mp4",
+    "video/avi",
+    "video/mpeg",
+  ];
 
-  // Return the appropriate middleware for the specified field
-  return upload.single(fieldName);
+  // Configure multer instance with file validation
+  const upload = multer({
+    storage,
+    fileFilter: (req, file, cb) => {
+      if (allowedTypes.includes(file.mimetype)) {
+        cb(null, true);
+      } else {
+        cb(new Error("Unsupported file type"), false);
+      }
+    },
+  });
+
+  // Return appropriate middleware based on upload type (single or multiple)
+  if (isSingle) {
+    if (!fieldName) {
+      throw new Error("Field name must be provided for single file upload.");
+    }
+    return upload.single(fieldName); // Middleware for single file upload
+  } else {
+    // Define fields for multiple files
+    return upload.fields([
+      { name: "zelleQrCode", maxCount: 1 },
+      { name: "paypalQrCode", maxCount: 1 },
+      { name: "csvFile", maxCount: 1 },
+      { name: "audioFile", maxCount: 1 },
+      { name: "videoFile", maxCount: 1 },
+    ]);
+  }
 };
-
-module.exports =  storeFile ;
