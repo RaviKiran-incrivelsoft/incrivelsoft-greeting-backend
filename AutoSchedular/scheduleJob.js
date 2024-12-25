@@ -57,6 +57,8 @@ const watchSchedules = async () => {
 
             if (change.operationType === 'insert') {
                 const newJob = change.fullDocument;
+                console.log("Inserted: ", newJob);
+                if(newJob.schedule === "schedule_later" || newJob.schedule === "schedule_now" )
                 await handleJob(newJob);
             }
 
@@ -67,8 +69,8 @@ const watchSchedules = async () => {
                 console.log(`Job updated with ID: ${updatedJobId}`, updatedFields);
 
                 const updatedJob = await scheduleSchema.findById(updatedJobId);
-                if (updatedJob) {
-                    await handleJob(updatedJob, true); // Pass true to indicate an update
+                if (updatedJob && (updatedJob.schedule !== "completed") ) {
+                    await handleJob(updatedJob); // Pass true to indicate an update
                 }
             }
         });
@@ -79,63 +81,55 @@ const watchSchedules = async () => {
 
 const handleJob = async (job, isUpdate = false) => {
     try {
-        const { _id, schedule, time, temple, user } = job;
 
-        if (schedule === 'schedule_now') {
-            console.log(`Executing schedule_now for job ID: ${_id}`);
+        if (job.schedule === 'schedule_now') {
+            console.log(`Executing schedule_now for job ID: ${job._id}`);
 
             // Execute the job immediately
             try {
-                await sendGreetings(temple); // Ensure this function is awaited and handles errors properly
-                console.log(`Temple: ${temple}, User: ${user}`);
-                await scheduleSchema.findByIdAndUpdate(_id, { schedule: 'completed' }); // Mark as completed
+                await sendGreetings(job.temple); // Ensure this function is awaited and handles errors properly
+                console.log(`Temple: ${job.temple}, User: ${job.user}`);
+                await scheduleSchema.findByIdAndUpdate(job._id, { schedule: 'completed' }); // Mark as completed
             } catch (error) {
-                console.error(`Error executing schedule_now job ID: ${_id}`, error);
+                console.error(`Error executing schedule_now job ID: ${job._id}`, error);
             }
             return; // No need to schedule or handle further
         }
 
-        if (schedule === 'schedule_later') {
-            const scheduledTime = new Date(time);
+       else if (job.schedule === 'schedule_later') {
+            const scheduledTime = new Date(job.time);
 
             if (isNaN(scheduledTime) || scheduledTime < new Date()) {
-                console.log(`Invalid or past schedule for job ID: ${_id}`);
+                console.log(`Invalid or past schedule for job ID: ${job._id}`);
                 return; // Skip invalid or past dates
             }
 
-            if (isUpdate) {
-                // Cancel existing job if it's being updated
-                const existingJob = schedule.scheduledJobs[_id.toString()];
-                if (existingJob) {
-                    console.log(`Cancelling existing job with ID: ${_id}`);
-                    existingJob.cancel();
-                }
-            }
+
 
             // Schedule the new or updated job
-            schedule.scheduleJob(_id.toString(), scheduledTime, async () => {
+            schedule.scheduleJob(job._id.toString(), scheduledTime, async () => {
                 try {
-                    console.log(`Executing job for ID: ${_id}`);
-                    await sendGreetings(temple); // Ensure this function handles errors
-                    console.log(`Temple: ${temple}, User: ${user}`);
+                    console.log(`Executing job for ID: ${job._id}`);
+                    await sendGreetings(job.temple); // Ensure this function handles errors
+                    console.log(`Temple: ${job.temple}, User: ${job.user}`);
 
                     // Mark the job as completed
-                    await scheduleSchema.findByIdAndUpdate(_id, { schedule: 'completed' });
+                    await scheduleSchema.findByIdAndUpdate(job._id, { schedule: 'completed' });
                 } catch (error) {
-                    console.error(`Error executing job ID: ${_id}`, error);
+                    console.log(`Error executing job ID: ${job._id}`, error);
                 }
             });
 
-            console.log(`Scheduled job ID: ${_id} for time: ${scheduledTime}`);
-        } else if (schedule === 'pause') {
-            const existingJob = schedule.scheduledJobs[_id.toString()];
+            console.log(`Scheduled job ID: ${job._id} for time: ${scheduledTime}`);
+        } else if (job.schedule === 'pause') {
+            const existingJob = schedule.scheduledJobs[job._id.toString()];
             if (existingJob) {
-                console.log(`Pausing job with ID: ${_id}`);
+                console.log(`Pausing job with ID: ${job._id}`);
                 existingJob.cancel();
             }
         }
     } catch (error) {
-        console.error(`Error handling job ID: ${_id}`, error);
+        console.error(`Error handling job ID: ${job._id}`, error);
     }
 };
 

@@ -8,7 +8,7 @@ import campaignRoutes from './routes/campaignRoutes.js';
 import userRoutes from './routes/userRoutes.js';
 import { templeRouter } from "./routes/templeRoutes.js";
 import { scheduleRouter } from "./routes/scheduleRoutes.js";
-import {watchSchedules, scheduleJobs} from "./AutoSchedular/scheduleJob.js";
+import { watchSchedules, scheduleJobs } from "./AutoSchedular/scheduleJob.js";
 
 dotenv.config();
 
@@ -36,6 +36,7 @@ app.use("/temple", templeRouter);
 app.use("/schedule", scheduleRouter);
 
 
+
 // Server setup
 const port = process.env.DB_PORT || 3000;  // Default port is 3000 if DB_PORT is not specified
 app.listen(port, async () => {
@@ -45,4 +46,8 @@ app.listen(port, async () => {
   // Start watching the collection for scheduling
   await scheduleJobs();
   await watchSchedules();
+  const currentDate = new Date();
+  currentDate.setMinutes(currentDate.getMinutes() + 5);
+
+  console.log(currentDate);
 });
