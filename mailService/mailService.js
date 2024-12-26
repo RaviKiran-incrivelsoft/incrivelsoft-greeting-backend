@@ -4,6 +4,9 @@ import { getTempleData } from "../controllers/templeController.js";
 const EMAIL = process.env.EMAIL;
 const PASS_KEY = process.env.PASS_KEY;
 const BASE_URL = process.env.BASE_URL;
+const ChristmasVideo = BASE_URL+"christhmasVideo.mp4".replace(/\\/g, '/');
+const ChristmasImage = BASE_URL+"christhmasImage.png".replace(/\\/g, '/');
+
 
 export default async function sendGreetings(templeId) {
     console.log("Entered into mail service and temple id: ", templeId);
@@ -90,7 +93,7 @@ export default async function sendGreetings(templeId) {
                                         <tr>
                                             <td>
                                                 <div style="text-align: left; margin-left: 180px">
-                                                    <p><b class="namaste-text" style="color: #5a0901; font-size: 20px;">Namaste <span style="text-transform: uppercase;">${userDetails.last_name} ${userDetails.first_name}</span></b></p>
+                                                    <p><b class="namaste-text" style="color: #5a0901; font-size: 20px;">Namaste <span style="text-transform: uppercase;">${template.fullName}</span></b></p>
                                                 </div>
                                             </td>
                                         </tr>
@@ -127,7 +130,7 @@ export default async function sendGreetings(templeId) {
                                                     <tr>
                                                         <td>
                                                             <div style="margin-top: 1px; margin-right: 10px; margin-left: 10px; position: relative; display: inline-block;">
-                                                                <a href="http://localhost:3000/video-page" style="position: relative;"><img src="cid:birthday_wishes" alt="Birthday Wishes" style="max-width: 100%; height: auto; border-radius: 10px;"></a>
+                                                                <a href="${ChristmasVideo}" style="position: relative;"><img src="${ChristmasImage}" alt="Birthday Wishes" style="max-width: 100%; height: auto; border-radius: 10px;"></a>
                                                             </div>
                                                         </td>
                                                     </tr>

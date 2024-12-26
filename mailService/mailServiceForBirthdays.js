@@ -4,6 +4,9 @@ const EMAIL = process.env.EMAIL;
 const PASS_KEY = process.env.PASS_KEY;
 const BASE_URL = process.env.BASE_URL;
 const templeImage = BASE_URL+"uploads/santaImage.png".replace(/\\/g, '/');
+const birthdayVideo = BASE_URL+"birthdayVideo.mp4".replace(/\\/g, '/');
+const birthdayImage = BASE_URL+"birthdayImage.png".replace(/\\/g, '/');
+
 
 export default async function sendGreetings(template, userDetails) {
     console.log("templeDetails: ", template);
@@ -43,7 +46,7 @@ function createEmailContent(template, userDetails) {
         <!DOCTYPE html>
         <html>
         <head>
-            <title>Happy Christmas</title>
+            <title>Happy Birthday</title>
         </head>
         <body>
             <table width="100%" border="0" cellpadding="0" cellspacing="0">
@@ -96,13 +99,13 @@ function createEmailContent(template, userDetails) {
                                                     </table>
                                                 </div>
                                                 <div style="text-align: center; background-color: #ed6f0e; padding: 18px; border-radius: 8px; margin: 10px 10px;">
-                                                    <p style="font-size: 25px; font-weight: bold; color: #ffffff; font-family: 'Georgia', serif, cursive; margin: 0;">Happy Christmas</p>
+                                                    <p style="font-size: 25px; font-weight: bold; color: #ffffff; font-family: 'Georgia', serif, cursive; margin: 0;">Happy BirthDay</p>
                                                 </div>
                                                 <table cellspacing="0" cellpadding="0">
                                                     <tr>
                                                         <td>
                                                             <div style="margin-top: 1px; margin-right: 10px; margin-left: 10px; position: relative; display: inline-block;">
-                                                                <a href="http://localhost:3000/video-page" style="position: relative;"><img src="cid:birthday_wishes" alt="Birthday Wishes" style="max-width: 100%; height: auto; border-radius: 10px;"></a>
+                                                                <a href="${birthdayVideo}" style="position: relative;"><img src="${birthdayImage}" alt="Birthday Wishes" style="max-width: 100%; height: auto; border-radius: 10px;"></a>
                                                             </div>
                                                         </td>
                                                     </tr>
