@@ -2,9 +2,9 @@ import { scheduleSchema } from "../models/Schedule.js";
 
 const createSchedule = async (req, res) => {
     try {
-        const { schedule, time, temple } = req.body;
+        const { schedule, time, temple, mode } = req.body;
         const user = req.user.userId;
-        const requiredFields = { schedule, time, temple };
+        const requiredFields = { schedule, time, temple, mode };
         const missingFields = [];
         Object.keys(requiredFields).forEach(key => {
             if (requiredFields[key] === undefined) {
@@ -14,7 +14,7 @@ const createSchedule = async (req, res) => {
         if (missingFields.length !== 0) {
             return res.status(400).send({ error: `${missingFields} are required...` });
         }
-        const saveSchedule = new scheduleSchema({ schedule, time, temple, user });
+        const saveSchedule = new scheduleSchema({ schedule, time, temple, user, mode });
         await saveSchedule.save();
         res.status(201).send({ message: `Schedule is create with id: ${saveSchedule._id}` })
     } catch (error) {
@@ -25,7 +25,7 @@ const createSchedule = async (req, res) => {
 
 const updateSchedule = async (req, res) => {
     try {
-        const { schedule, time, media } = req.body;
+        const { schedule, time, mode } = req.body;
         const { id } = req.params;
         const fieldsToUpdate = {};
         if (schedule !== undefined) {
@@ -33,6 +33,9 @@ const updateSchedule = async (req, res) => {
         }
         if (time !== undefined) {
             fieldsToUpdate.time = time;
+        }
+        if (mode !== undefined) {
+            fieldsToUpdate.mode = mode;
         }
         const updateSchedule = await scheduleSchema.findByIdAndUpdate(id, fieldsToUpdate, { new: true, runValidators: true });
         if (!updateSchedule) {
@@ -75,4 +78,13 @@ const deleteSchedule = async (req, res) => {
     }
 }
 
-export { createSchedule, updateSchedule, getSchedules, deleteSchedule };
+const fetchSchedules = async(schedule) => {
+    try {
+        const schedules = await scheduleSchema.find({schedule});
+        return schedules;
+    } catch (error) {
+        console.log("Error in the fetchSchedules....", error);
+    }
+}
+
+export { createSchedule, updateSchedule, getSchedules, deleteSchedule, fetchSchedules };

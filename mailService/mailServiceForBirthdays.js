@@ -1,70 +1,45 @@
 import nodemailer from "nodemailer";
-import { getTempleData } from "../controllers/templeController.js";
 
 const EMAIL = process.env.EMAIL;
 const PASS_KEY = process.env.PASS_KEY;
 const BASE_URL = process.env.BASE_URL;
+const templeImage = BASE_URL+"uploads/santaImage.png";
 
-export default async function sendGreetings(templeId) {
-    console.log("Entered into mail service and temple id: ", templeId);
+export default async function sendGreetings(template, userDetails) {
+    console.log("templeDetails: ", template);
 
-    const templeDetails = await getTempleData(templeId);
-    console.log("templeDetails: ", templeDetails);
-    const templeImage = "uploads/santaImage.png";
+    console.log("Sending the birthday email for ", userDetails.email);
 
-    for (const user of templeDetails.csvUser) {
-        // Constructs a JSON object templateJSON using string interpolation
-        const templateJSON = JSON.stringify({
-            fullName: `${user.first_name} ${user.last_name}`,
-            templeBanner: `${BASE_URL}/${templeDetails.campaign.mediaURL.replace(/\\/g, '/')}`,
-            templeImage: `${BASE_URL}/${templeImage.replace(/\\/g, '/')}`,
-            templeDescription: templeDetails.templeDescription,
-            address: templeDetails.address,
-            taxId: templeDetails.taxId,
-            phone: templeDetails.phone,
-            fax: templeDetails.fax,
-            websiteUrl: templeDetails.websiteUrl,
-            facebookUrl: templeDetails.facebookUrl,
-            twitterUrl: templeDetails.twitterUrl,
-            instagramUrl: templeDetails.instagramUrl,
-            paypalQrCode: `${BASE_URL}/${templeDetails.paypalQrCodeURL.replace(/\\/g, '/')}`,
-            zelleQrCode: `${BASE_URL}/${templeDetails.zelleQrCodeURL.replace(/\\/g, '/')}`
-        });
-        console.log("templateJSON: , ", templateJSON)
+    // Nodemailer transporter configured with a Gmail account
+    const transporter = nodemailer.createTransport({
+        host: "smtp.gmail.com",
+        auth: {
+            user: EMAIL,
+            pass: PASS_KEY
+        }
+    });
 
-        // Parses the JSON object to create a proper JavaScript object
-        const template = JSON.parse(templateJSON);
+    // Constructs an email object with the following details
+    const mailOptions = {
+        from: EMAIL,
+        to: userDetails.email,
+        subject: "Happy Birthday!",
+        html: createEmailContent(template, userDetails)
+    };
 
-        // Nodemailer transporter configured with a Gmail account
-        const transporter = nodemailer.createTransport({
-            host: "smtp.gmail.com",
-            auth: {
-                user: EMAIL,
-                pass: PASS_KEY
-            }
-        });
+    // Sends the email using transporter.sendMail and logs success or error messages
+    transporter.sendMail(mailOptions, (error, info) => {
+        if (error) {
+            console.log(error);
+        } else {
+            console.log("Email sent: " + info.response);
+        }
+    });
+}
 
-        // Constructs an email object with the following details
-        const mailOptions = {
-            from: "",
-            to: user.email,
-            subject: "Happy Christmas!",
-            html: createEmailContent(template)
-        };
-
-        // Sends the email using transporter.sendMail and logs success or error messages
-        transporter.sendMail(mailOptions, (error, info) => {
-            if (error) {
-                console.log(error);
-            } else {
-                console.log("Email sent: " + info.response);
-            }
-        });
-    }
-
-    /// Function to generate the HTML content of the email
-    function createEmailContent(template) {
-        const html = `
+/// Function to generate the HTML content of the email
+function createEmailContent(template, userDetails) {
+    const html = `
         <!DOCTYPE html>
         <html lang="en">
         <head>
@@ -78,12 +53,12 @@ export default async function sendGreetings(templeId) {
                     <img src="${template.templeBanner}" alt="Temple Banner" style="width: 100%; max-width: 650px; height: auto; border-radius: 10px;">
                 </div>
                 <div style="background-color: #1dbffc; padding: 20px; text-align: center; font-size: 24px; color: #ffffff; font-weight: bold;">
-                    <p>Namaste, <span style="text-transform: uppercase;">${template.fullName}</span></p>
+                    <p>Namaste, <span style="text-transform: uppercase;">${userDetails.firstname} ${userDetails.lastname}</span></p>
                 </div>
                 <div style="padding: 20px; background-color: #ffffff; font-size: 16px; color: #333; line-height: 1.6;">
                     <div style="display: flex; justify-content: space-between; gap: 20px; flex-wrap: wrap;">
                         <div style="flex: 1; max-width: 300px; border-radius: 8px; overflow: hidden;">
-                            <img src="${template.templeImage}" alt="Hindu Community and Cultural Center" style="width: 100%; max-width: 600px; height: auto; border-radius: 8px; margin: 20px 0;">
+                            <img src="${templeImage}" alt="Hindu Community and Cultural Center" style="width: 100%; max-width: 600px; height: auto; border-radius: 8px; margin: 20px 0;">
                         </div>
                         <div style="flex: 2; max-width: 380px; font-family: 'Georgia', serif; color: #333;">
                             <p>${template.templeDescription}</p>
@@ -115,6 +90,6 @@ export default async function sendGreetings(templeId) {
         </body>
         </html>`;
 
-        return html;
-    }
+    return html;
 }
+

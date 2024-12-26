@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 import schedule from 'node-schedule';
 import { scheduleSchema } from '../models/Schedule.js';
 import sendGreetings from "../mailService/mailService.js";
-
+import sendMails from "../utils/checkBirthAndGreetingsByEmail.js";
 /**
  * Schedule jobs automatically based on the database records.
  */
@@ -26,11 +26,23 @@ const scheduleJobs = async () => {
             schedule.scheduleJob(job._id.toString(), scheduledTime, async () => {
                 try {
                     console.log(`Executing scheduled job for ID: ${job._id}`);
-                    await sendGreetings(job.temple);  // Ensure this function returns a promise and handles errors
-                    console.log(`Temple: ${job.temple}, User: ${job.user}`);
+                    if (job.mode === "email") {
+                        await sendGreetings(job.temple);  // Ensure this function returns a promise and handles errors
+                        console.log(`Temple: ${job.temple}, User: ${job.user}`);
+                        await scheduleSchema.findByIdAndUpdate(job._id, { schedule: 'completed' });
+                    }
+                    else if (job.mode === "whatsapp") {
+                        console.log("Whatsapp services is not yet implemented...");
+                    }
+                    else {
+                        await sendGreetings(job.temple);  // Ensure this function returns a promise and handles errors
+                        console.log(`Temple: ${job.temple}, User: ${job.user}`);
+                        await scheduleSchema.findByIdAndUpdate(job._id, { schedule: 'completed' });
+                        console.log("Whatsapp service is not yet implemented...");
 
+                    }
                     // Mark the schedule as completed
-                    await scheduleSchema.findByIdAndUpdate(job._id, { schedule: 'completed' });
+
                 } catch (error) {
                     console.error(`Error executing job ID: ${job._id}`, error);
                 }
@@ -58,8 +70,8 @@ const watchSchedules = async () => {
             if (change.operationType === 'insert') {
                 const newJob = change.fullDocument;
                 console.log("Inserted: ", newJob);
-                if(newJob.schedule === "schedule_later" || newJob.schedule === "schedule_now" )
-                await handleJob(newJob);
+                if (newJob.schedule === "schedule_later" || newJob.schedule === "schedule_now")
+                    await handleJob(newJob);
             }
 
             if (change.operationType === 'update') {
@@ -69,8 +81,8 @@ const watchSchedules = async () => {
                 console.log(`Job updated with ID: ${updatedJobId}`, updatedFields);
 
                 const updatedJob = await scheduleSchema.findById(updatedJobId);
-                if (updatedJob && (updatedJob.schedule !== "completed") ) {
-                    await handleJob(updatedJob); // Pass true to indicate an update
+                if (updatedJob && (updatedJob.schedule !== "completed" || updatedJob.schedule !== "automate")) {
+                    await handleJob(updatedJob);
                 }
             }
         });
@@ -87,16 +99,27 @@ const handleJob = async (job, isUpdate = false) => {
 
             // Execute the job immediately
             try {
-                await sendGreetings(job.temple); // Ensure this function is awaited and handles errors properly
-                console.log(`Temple: ${job.temple}, User: ${job.user}`);
-                await scheduleSchema.findByIdAndUpdate(job._id, { schedule: 'completed' }); // Mark as completed
+                if (job.mode === "email") {
+                    await sendGreetings(job.temple); // Ensure this function is awaited and handles errors properly
+                    console.log(`Temple: ${job.temple}, User: ${job.user}`);
+                    await scheduleSchema.findByIdAndUpdate(job._id, { schedule: 'completed' }); // Mark as completed
+                }
+                else if (job.mode === "whatsapp") {
+                    console.log("Whatsapp service is not yet implemented...");
+                }
+                else {
+                    await sendGreetings(job.temple); // Ensure this function is awaited and handles errors properly
+                    console.log(`Temple: ${job.temple}, User: ${job.user}`);
+                    console.log("Whatsapp service is not yet implemented...");
+                    await scheduleSchema.findByIdAndUpdate(job._id, { schedule: 'completed' }); // Mark as completed
+                }
             } catch (error) {
                 console.error(`Error executing schedule_now job ID: ${job._id}`, error);
             }
             return; // No need to schedule or handle further
         }
 
-       else if (job.schedule === 'schedule_later') {
+        else if (job.schedule === 'schedule_later') {
             const scheduledTime = new Date(job.time);
 
             if (isNaN(scheduledTime) || scheduledTime < new Date()) {
@@ -110,11 +133,20 @@ const handleJob = async (job, isUpdate = false) => {
             schedule.scheduleJob(job._id.toString(), scheduledTime, async () => {
                 try {
                     console.log(`Executing job for ID: ${job._id}`);
-                    await sendGreetings(job.temple); // Ensure this function handles errors
-                    console.log(`Temple: ${job.temple}, User: ${job.user}`);
-
-                    // Mark the job as completed
-                    await scheduleSchema.findByIdAndUpdate(job._id, { schedule: 'completed' });
+                    if (job.mode === "email") {
+                        await sendGreetings(job.temple); // Ensure this function is awaited and handles errors properly
+                        console.log(`Temple: ${job.temple}, User: ${job.user}`);
+                        await scheduleSchema.findByIdAndUpdate(job._id, { schedule: 'completed' }); // Mark as completed
+                    }
+                    else if (job.mode === "whatsapp") {
+                        console.log("Whatsapp service is not yet implemented...");
+                    }
+                    else {
+                        await sendGreetings(job.temple); // Ensure this function is awaited and handles errors properly
+                        console.log(`Temple: ${job.temple}, User: ${job.user}`);
+                        console.log("Whatsapp service is not yet implemented...");
+                        await scheduleSchema.findByIdAndUpdate(job._id, { schedule: 'completed' }); // Mark as completed
+                    }
                 } catch (error) {
                     console.log(`Error executing job ID: ${job._id}`, error);
                 }
@@ -132,6 +164,11 @@ const handleJob = async (job, isUpdate = false) => {
         console.error(`Error handling job ID: ${job._id}`, error);
     }
 };
+
+schedule.scheduleJob('09 14 * * *', async() => {
+    console.log('Scheduled job triggered at:', new Date());
+    await sendMails();
+});
 
 
 export { watchSchedules, scheduleJobs };

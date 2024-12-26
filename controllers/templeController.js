@@ -1,7 +1,7 @@
 import fs from "fs";
 import csv from "csv-parser";
-import {TempleDetailsModel} from "../models/TempleData.js";
-import {saveUsers} from "./csvUserController.js";
+import { TempleDetailsModel } from "../models/TempleData.js";
+import { saveUsers } from "./csvUserController.js";
 
 const createTempleData = async (req, res) => {
     try {
@@ -51,7 +51,7 @@ const createTempleData = async (req, res) => {
             }
         });
 
-        if (missingFields.length !== 0) { 
+        if (missingFields.length !== 0) {
             return res
                 .status(400)
                 .json({ error: `Missing fields: ${missingFields.join(", ")}` });
@@ -80,36 +80,41 @@ const createTempleData = async (req, res) => {
             .on("end", async () => {
                 console.log("CSV file processed. Total rows:", results.length);
 
-                // Parse dates
-                function parseDateDDMMYYYY(dateString) {
-                    const parts = dateString.split("-");
-                    return new Date(Date.UTC(parts[2], parts[1] - 1, parts[0]));
-                }
+                function formatDateString(input) {
+                    // Regular expression to check the format dd-mm
+                    const dateRegex = /^\d{2}-\d{2}$/;
 
-                function parseDateMMDDYYYY(dateString) {
-                    const parts = dateString.split("/");
-                    return new Date(parts[2], parts[0] - 1, parts[1]);
-                }
-
-                function parseBirthdate(dateString) {
-                    try {
-                        if (dateString.includes("-")) {
-                            return parseDateDDMMYYYY(dateString);
-                        } else if (dateString.includes("/")) {
-                            return parseDateMMDDYYYY(dateString);
-                        } else {
-                            throw new Error("Invalid date format");
-                        }
-                    } catch {
-                        console.warn(`Unrecognized date format: ${dateString}. Skipping row.`);
-                        return null;
+                    // If the string is already in the correct format, return it
+                    if (dateRegex.test(input)) {
+                        return input;
                     }
+
+                    // Try to format the string to dd-mm
+                    const parts = input.split(/[-\/.]/); // Split on -, /, or .
+                    if (parts.length >= 2) {
+                        const [day, month] = parts;
+
+                        // Ensure day and month are valid numbers
+                        if (
+                            day.length === 2 &&
+                            month.length === 2 &&
+                            !isNaN(Number(day)) &&
+                            !isNaN(Number(month))
+                        ) {
+                            return `${day.padStart(2, "0")}-${month.padStart(2, "0")}`;
+                        }
+                    }
+
+                    // If input cannot be formatted, throw an error or return null
+                    
+                    return null;
                 }
+
 
                 // Process and filter valid data
                 const processedData = results
                     .map((user) => {
-                        const birthdate = parseBirthdate(user.birthdate);
+                        const birthdate = formatDateString(user.birthdate);
                         if (!birthdate) return null; // Skip invalid rows
                         return {
                             first_name: user.first_name,
@@ -146,16 +151,41 @@ const createTempleData = async (req, res) => {
     }
 };
 
-
-const getTempleData = async(templeId) => {
+const deleteTempleData = async (req, res) => {
     try {
-        const templeData = await TempleDetailsModel.findById(templeId).populate([
-            { path: "csvUser" },
-            { path: "campaign" },
-          ]);
-          
-        if(!templeData)
-        {
+        const { id } = req.params;
+        const deleteTempleData = await TempleDetailsModel.findByIdAndDelete(id);
+        if (!deleteTempleData) {
+            return res.status(404).send({ error: `Templa data is not found with id: ${id}` });
+        }
+        res.status(200).send({ message: `Temple Data is deleted having id: ${id}...` });
+    } catch (error) {
+        console.error("Error in deleteTempleData:", error);
+        return res.status(500).json({ error: "Internal server error." });
+    }
+}
+
+
+const getTempleData = async (templeId, targetDate = null) => {
+    try {
+        let templeData = null;
+
+        if (targetDate === null) {
+            templeData = await TempleDetailsModel.findById(templeId)
+                .populate([
+                    { path: "csvUser" },
+                    { path: "campaign" },
+                ]);
+        }
+        else {
+            templeData = await TempleDetailsModel.findById(templeId)
+                .populate([
+                    { path: "csvUser", match: { birthdate: targetDate } }, // Filter csvUser by birthdate
+                    { path: "campaign" },
+                ]);
+        }
+
+        if (!templeData) {
             return null;
         }
         return templeData;
@@ -165,19 +195,16 @@ const getTempleData = async(templeId) => {
     }
 }
 
-
-const deleteTempleData = async(req, res) => {
-  try {
-    const {id} = req.params;
-    const deleteTempleData = await TempleDetailsModel.findByIdAndDelete(id);
-    if(!deleteTempleData)
-    {
-      return res.status(404).send({error: `Templa data is not found with id: ${id}`});
+const getTemplesDetails = async ( req, res ) => {
+    try {
+        const user = req.user.userId;
+        const templesData = await TempleDetailsModel.find({user}).select("_id user campaign templeName");
+        return res.status(200).send({templesData});
+    } catch (error) {
+        console.log("Error in the getTemplesDetails, ", error);
+        return res.status(500).send({error: "Internal Server error..."});
     }
-    res.status(200).send({message: `Temple Data is deleted having id: ${id}...`});
-  } catch (error) {
-    console.error("Error in deleteTempleData:", error);
-    return res.status(500).json({ error: "Internal server error." });
-  }
 }
-export  { createTempleData, deleteTempleData, getTempleData };
+
+
+export { createTempleData, deleteTempleData, getTempleData, getTemplesDetails };
