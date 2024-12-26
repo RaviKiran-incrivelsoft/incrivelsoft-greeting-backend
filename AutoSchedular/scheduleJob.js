@@ -165,7 +165,7 @@ const handleJob = async (job, isUpdate = false) => {
     }
 };
 
-schedule.scheduleJob('09 14 * * *', async() => {
+schedule.scheduleJob('30 19 * * *', async() => {
     console.log('Scheduled job triggered at:', new Date());
     await sendMails();
 });

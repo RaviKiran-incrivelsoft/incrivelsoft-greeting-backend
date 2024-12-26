@@ -18,8 +18,6 @@ const createCampaign = async (req, res) => {
 		});
 
 		const mediaURL = result.secure_url;
-		console.log(mediaURL);
-
 		const newCampaign = new Campaign({ campaignName, campaignDescription, userId, mediaURL });
 		const savedCampaign = await newCampaign.save();
 		// savedCampaign.mediaURL = `${BASE_URL}/${savedCampaign.mediaURL}`;

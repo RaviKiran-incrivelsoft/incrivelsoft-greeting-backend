@@ -2,6 +2,7 @@ import fs from "fs";
 import csv from "csv-parser";
 import { TempleDetailsModel } from "../models/TempleData.js";
 import { saveUsers } from "./csvUserController.js";
+import cloudinary from "../cloudinary/config.js";
 
 const createTempleData = async (req, res) => {
     try {

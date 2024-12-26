@@ -24,6 +24,7 @@ export const configureFileUpload = (isSingle = false, fieldName = "") => {
   const allowedTypes = [
     "image/jpeg",
     "image/png",
+    "image/webp",
     "text/csv",
     "audio/mpeg",
     "audio/mp3",
@@ -37,6 +38,8 @@ export const configureFileUpload = (isSingle = false, fieldName = "") => {
   const upload = multer({
     storage,
     fileFilter: (req, file, cb) => {
+      console.log(file.mimetype);
+      
       if (allowedTypes.includes(file.mimetype)) {
         cb(null, true);
       } else {
