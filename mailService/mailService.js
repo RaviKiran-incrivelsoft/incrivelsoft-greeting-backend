@@ -12,7 +12,6 @@ export default async function sendGreetings(templeId) {
     console.log("Entered into mail service and temple id: ", templeId);
 
     const templeDetails = await getTempleData(templeId);
-    console.log("templeDetails: ", templeDetails);
     const templeImage = "uploads/santaImage.png";
 
     for (const user of templeDetails.csvUser) {

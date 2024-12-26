@@ -9,7 +9,6 @@ const birthdayImage = `${BASE_URL}/uploads/birthdayImage.png`;
 
 
 export default async function sendGreetings(template, userDetails) {
-    console.log("templeDetails: ", template);
 
     console.log("Sending the birthday email for ", userDetails.email);
 
