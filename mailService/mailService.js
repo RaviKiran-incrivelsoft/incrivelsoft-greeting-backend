@@ -4,8 +4,8 @@ import { getTempleData } from "../controllers/templeController.js";
 const EMAIL = process.env.EMAIL;
 const PASS_KEY = process.env.PASS_KEY;
 const BASE_URL = process.env.BASE_URL;
-const ChristmasVideo = BASE_URL+"christhmasVideo.mp4";
-const ChristmasImage = BASE_URL+"christhmasImage.png";
+const ChristmasVideo = `${BASE_URL}/uploads/christhmasVideo.mp4`;
+const ChristmasImage = `${BASE_URL}/uploads/christhmasImage.png`;
 
 
 export default async function sendGreetings(templeId) {
@@ -109,7 +109,7 @@ export default async function sendGreetings(templeId) {
                                                             <td>
                                                                 <div style="float: left; width: 40%; margin-top: 10px; margin-left: 10px;">
                                                                     <div style="width: 440px; overflow: hidden; border-radius: 30% 30% 0% 0%;">
-                                                                        <img src="${template.templeImage}" alt="Hindu Community and Cultural Center" style="width: 100%; height: auto;">
+                                                                        <img src="${templeImage}" alt="Hindu Community and Cultural Center" style="width: 100%; height: auto;">
                                                                     </div>
                                                                 </div>
                                                             </td>

@@ -3,9 +3,9 @@ import nodemailer from "nodemailer";
 const EMAIL = process.env.EMAIL;
 const PASS_KEY = process.env.PASS_KEY;
 const BASE_URL = process.env.BASE_URL;
-const templeImage = BASE_URL+"uploads/santaImage.png";
-const birthdayVideo = BASE_URL+"birthdayVideo.mp4";
-const birthdayImage = BASE_URL+"birthdayImage.png";
+const templeImage = `${BASE_URL}/uploads/santaImage.png`;
+const birthdayVideo = `${BASE_URL}/uploads/birthdayVideo.mp4`;
+const birthdayImage = `${BASE_URL}/uploads/birthdayImage.png`;
 
 
 export default async function sendGreetings(template, userDetails) {
