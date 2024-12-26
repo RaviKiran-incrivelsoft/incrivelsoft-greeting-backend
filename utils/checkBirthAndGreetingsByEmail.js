@@ -31,7 +31,7 @@ const createTempleDetailsTemplate = (templeDetails) => {
         paypalQrCode: `${templeDetails.paypalQrCodeURL.replace(/\\/g, '/')}`,
         zelleQrCode: `${templeDetails.zelleQrCodeURL.replace(/\\/g, '/')}`
     });
-    console.log("templateJSON: , ", templateJSON)
+    // console.log("templateJSON: , ", templateJSON)
 
     // Parses the JSON object to create a proper JavaScript object
     const template = JSON.parse(templateJSON);

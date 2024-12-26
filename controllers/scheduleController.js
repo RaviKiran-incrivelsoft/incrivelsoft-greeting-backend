@@ -4,19 +4,18 @@ const createSchedule = async (req, res) => {
     try {
         const { schedule, time, temple, mode } = req.body;
         const user = req.user.userId;
-        const requiredFields = { schedule, time, temple, mode };
-        const missingFields = [];
-        Object.keys(requiredFields).forEach(key => {
-            if (requiredFields[key] === undefined) {
-                missingFields.push(key);
-            }
-        });
-        if (missingFields.length !== 0) {
-            return res.status(400).send({ error: `${missingFields} are required...` });
+        const requiredFields = { schedule, temple, mode };
+        const missingFields = Object.keys(requiredFields).filter(key => requiredFields[key] === undefined);
+
+        if (missingFields.length > 0) {
+            return res.status(400).send({ error: `${missingFields.join(", ")} are required...` });
+        }
+        if (schedule === "schedule_later" && !time) {
+            return res.status(400).send({ error: "Time is required for 'schedule_later'." });
         }
         const saveSchedule = new scheduleSchema({ schedule, time, temple, user, mode });
         await saveSchedule.save();
-        res.status(201).send({ message: `Schedule is create with id: ${saveSchedule._id}` })
+        res.status(201).send({ message: 'Schedule created Successfully' })
     } catch (error) {
         console.log("Error in the createSchedule, ", error);
         res.status(500).send({ error: "Internal Server error..." });
