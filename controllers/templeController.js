@@ -58,8 +58,12 @@ const createTempleData = async (req, res) => {
         }
 
         // Add file paths to requiredFields
-        requiredFields.zelleQrCodeURL = req.files.zelleQrCode[0].path;
-        requiredFields.paypalQrCodeURL = req.files.paypalQrCode[0].path;
+        const zelleQrCodeURL = await cloudinary.uploader.upload(req.files.zelleQrCode[0].path);
+        requiredFields.zelleQrCodeURL = zelleQrCodeURL.secure_url
+
+        const paypalQrCodeURL = await cloudinary.uploader.upload(req.files.paypalQrCode[0].path);
+        requiredFields.paypalQrCodeURL = paypalQrCodeURL.secure_url
+
         requiredFields.campaign = campaign;
         requiredFields.user = user;
 

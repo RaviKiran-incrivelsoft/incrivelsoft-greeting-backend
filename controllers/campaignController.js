@@ -1,6 +1,6 @@
+import cloudinary from '../cloudinary/config.js';
 import Campaign from '../models/Campaign.js';
-
-const BASE_URL = process.env.BASE_URL || "http://localhost:5000";
+// const BASE_URL = process.env.BASE_URL || "http://localhost:5000";
 
 // Create a new campaign
 const createCampaign = async (req, res) => {
@@ -13,10 +13,16 @@ const createCampaign = async (req, res) => {
 		return res.status(400).send({ error: "Image or Video is required..." });
 	}
 	try {
-		const mediaURL = req.file?.path;
+		const result = await cloudinary.uploader.upload(req.file.path, {
+			resource_type: req.file.mimetype.startsWith("video") ? "video" : "image",
+		});
+
+		const mediaURL = result.secure_url;
+		console.log(mediaURL);
+
 		const newCampaign = new Campaign({ campaignName, campaignDescription, userId, mediaURL });
 		const savedCampaign = await newCampaign.save();
-		savedCampaign.mediaURL = `${BASE_URL}/${savedCampaign.mediaURL}`;
+		// savedCampaign.mediaURL = `${BASE_URL}/${savedCampaign.mediaURL}`;
 		res.status(201).json(savedCampaign);
 	} catch (err) {
 		console.log("Error in the createCampaign, ", err)
@@ -32,8 +38,8 @@ const getAllCampaigns = async (req, res) => {
 		const skip = (page - 1) * limit;
 		const campaigns = await Campaign.find({ userId }).skip(skip).limit(limit);
 		const totalCampaigns = await Campaign.countDocuments({ userId });
-		const campaignWithHostedUrl = campaigns.map((campaign) => ({ ...campaign.toObject(), mediaURL: `${BASE_URL}/${campaign.mediaURL}` }));
-		res.status(200).send({ currentPage: page, totalPages: Math.ceil(totalCampaigns / limit), campaigns: campaignWithHostedUrl });
+		// const campaignWithHostedUrl = campaigns.map((campaign) => ({ ...campaign.toObject(), mediaURL: `${BASE_URL}/${campaign.mediaURL}` }));
+		res.status(200).send({ currentPage: page, totalPages: Math.ceil(totalCampaigns / limit), campaigns: campaigns });
 	} catch (err) {
 		console.log("Error in the getAllCampaigns, ", err)
 		res.status(500).json({ error: "Internal server error..." });
@@ -47,7 +53,7 @@ const getCampaignById = async (req, res) => {
 		if (!campaign) {
 			return res.status(404).json({ message: 'Campaign not found' });
 		}
-		campaign.mediaURL = `${BASE_URL}/${campaign.mediaURL}`
+		// campaign.mediaURL = `${BASE_URL}/${campaign.mediaURL}`
 		res.status(200).json(campaign);
 	} catch (err) {
 		console.log("Error in the getCampaignById, ", err)
@@ -60,17 +66,17 @@ const updateCampaign = async (req, res) => {
 	try {
 		const { campaignName, campaignDescription } = req.body;
 		const fieldsToUpdate = {};
-		if(campaignDescription !== undefined)
-		{
+		if (campaignDescription !== undefined) {
 			fieldsToUpdate.campaignDescription = campaignDescription;
 		}
-		else if(campaignName !== undefined)
-		{
+		else if (campaignName !== undefined) {
 			fieldsToUpdate.campaignName = campaignName;
 		}
-		else if(req.file && req.file.path)
-		{
-			fieldsToUpdate.mediaURL = req.file.path;
+		else if (req.file && req.file.path) {
+			const result = await cloudinary.uploader.upload(req.file.path, {
+				resource_type: req.file.mimetype.startsWith("video") ? "video" : "image",
+			});
+			fieldsToUpdate.mediaURL = result.secure_url;
 		}
 		const updatedCampaign = await Campaign.findByIdAndUpdate(
 			req.params.id,

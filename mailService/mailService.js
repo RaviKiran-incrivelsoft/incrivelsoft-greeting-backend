@@ -18,7 +18,7 @@ export default async function sendGreetings(templeId) {
         // Constructs a JSON object templateJSON using string interpolation
         const templateJSON = JSON.stringify({
             fullName: `${user.first_name} ${user.last_name}`,
-            templeBanner: `${BASE_URL}/${templeDetails.campaign.mediaURL.replace(/\\/g, '/')}`,
+            templeBanner: `${templeDetails.campaign.mediaURL.replace(/\\/g, '/')}`,
             templeImage: `${BASE_URL}/${templeImage.replace(/\\/g, '/')}`,
             templeDescription: templeDetails.templeDescription,
             address: templeDetails.address,
@@ -29,8 +29,8 @@ export default async function sendGreetings(templeId) {
             facebookUrl: templeDetails.facebookUrl,
             twitterUrl: templeDetails.twitterUrl,
             instagramUrl: templeDetails.instagramUrl,
-            paypalQrCode: `${BASE_URL}/${templeDetails.paypalQrCodeURL.replace(/\\/g, '/')}`,
-            zelleQrCode: `${BASE_URL}/${templeDetails.zelleQrCodeURL.replace(/\\/g, '/')}`
+            paypalQrCode: `${templeDetails.paypalQrCodeURL.replace(/\\/g, '/')}`,
+            zelleQrCode: `${templeDetails.zelleQrCodeURL.replace(/\\/g, '/')}`
         });
         console.log("templateJSON: , ", templateJSON)
 

@@ -17,7 +17,7 @@ const todayDate = getTodayDate();
 const createTempleDetailsTemplate = (templeDetails) => {
 
     const templateJSON = JSON.stringify({
-        templeBanner: `${BASE_URL}/${templeDetails.campaign.mediaURL.replace(/\\/g, '/')}`,
+        templeBanner: `${templeDetails.campaign.mediaURL.replace(/\\/g, '/')}`,
         templeImage: `${BASE_URL}/${templeImage.replace(/\\/g, '/')}`,
         templeDescription: templeDetails.templeDescription,
         address: templeDetails.address,
@@ -28,8 +28,8 @@ const createTempleDetailsTemplate = (templeDetails) => {
         facebookUrl: templeDetails.facebookUrl,
         twitterUrl: templeDetails.twitterUrl,
         instagramUrl: templeDetails.instagramUrl,
-        paypalQrCode: `${BASE_URL}/${templeDetails.paypalQrCodeURL.replace(/\\/g, '/')}`,
-        zelleQrCode: `${BASE_URL}/${templeDetails.zelleQrCodeURL.replace(/\\/g, '/')}`
+        paypalQrCode: `${templeDetails.paypalQrCodeURL.replace(/\\/g, '/')}`,
+        zelleQrCode: `${templeDetails.zelleQrCodeURL.replace(/\\/g, '/')}`
     });
     console.log("templateJSON: , ", templateJSON)
 
