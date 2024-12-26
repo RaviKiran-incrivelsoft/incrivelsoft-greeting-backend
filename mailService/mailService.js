@@ -4,8 +4,8 @@ import { getTempleData } from "../controllers/templeController.js";
 const EMAIL = process.env.EMAIL;
 const PASS_KEY = process.env.PASS_KEY;
 const BASE_URL = process.env.BASE_URL;
-const ChristmasVideo = BASE_URL+"christhmasVideo.mp4".replace(/\\/g, '/');
-const ChristmasImage = BASE_URL+"christhmasImage.png".replace(/\\/g, '/');
+const ChristmasVideo = BASE_URL+"christhmasVideo.mp4";
+const ChristmasImage = BASE_URL+"christhmasImage.png";
 
 
 export default async function sendGreetings(templeId) {
