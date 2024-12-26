@@ -3,7 +3,7 @@ import nodemailer from "nodemailer";
 const EMAIL = process.env.EMAIL;
 const PASS_KEY = process.env.PASS_KEY;
 const BASE_URL = process.env.BASE_URL;
-const templeImage = BASE_URL+"uploads/santaImage.png";
+const templeImage = BASE_URL+"uploads/santaImage.png".replace(/\\/g, '/');
 
 export default async function sendGreetings(template, userDetails) {
     console.log("templeDetails: ", template);
@@ -41,52 +41,112 @@ export default async function sendGreetings(template, userDetails) {
 function createEmailContent(template, userDetails) {
     const html = `
         <!DOCTYPE html>
-        <html lang="en">
+        <html>
         <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Wishes</title>
+            <title>Happy Christmas</title>
         </head>
-        <body style="font-family: 'Arial', sans-serif; margin: 0; padding: 0; background-color: #f5f5f5;">
-            <div style="width: 100%; max-width: 700px; margin: 0 auto; background-color: #ffffff; border-radius: 10px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); overflow: hidden;">
-                <div style="background-color: #1dbffc; padding: 20px; text-align: center; color: white;">
-                    <img src="${template.templeBanner}" alt="Temple Banner" style="width: 100%; max-width: 650px; height: auto; border-radius: 10px;">
-                </div>
-                <div style="background-color: #1dbffc; padding: 20px; text-align: center; font-size: 24px; color: #ffffff; font-weight: bold;">
-                    <p>Namaste, <span style="text-transform: uppercase;">${userDetails.firstname} ${userDetails.lastname}</span></p>
-                </div>
-                <div style="padding: 20px; background-color: #ffffff; font-size: 16px; color: #333; line-height: 1.6;">
-                    <div style="display: flex; justify-content: space-between; gap: 20px; flex-wrap: wrap;">
-                        <div style="flex: 1; max-width: 300px; border-radius: 8px; overflow: hidden;">
-                            <img src="${templeImage}" alt="Hindu Community and Cultural Center" style="width: 100%; max-width: 600px; height: auto; border-radius: 8px; margin: 20px 0;">
+        <body>
+            <table width="100%" border="0" cellpadding="0" cellspacing="0">
+                <tr>
+                    <td valign="top">
+                        <div>
+                            <table width="100%" border="0" cellpadding="0" cellspacing="0">
+                                <tbody>
+                                    <tr>
+                                        <td align="center">
+                                            <img src="${template.templeBanner}" alt="Temple Banner"/>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <div style="margin: 10px 0px; text-align: center">
+                                <table>
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                <div style="text-align: left; margin-left: 180px">
+                                                    <p><b class="namaste-text" style="color: #5a0901; font-size: 20px;">Namaste <span style="text-transform: uppercase;">${userDetails.last_name} ${userDetails.first_name}</span></b></p>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <table border="0" cellspacing="0" cellpadding="0" width="800" align="center" style="text-align: left; background-color:#ffaf4d; border: 5px solid #5a0901; line-height: 20px; font-family: Verdana, Geneva, sans-serif; color: #000000; font-size: 13px;">
+                                    <tbody>
+                                        <tr>
+                                            <td valign="top">
+                                                <div align="center">
+                                                    <table border="0" cellspacing="0" cellpadding="0" width="800" align="center">
+                                                        <tr>
+                                                            <td>
+                                                                <div style="float: left; width: 40%; margin-top: 10px; margin-left: 10px;">
+                                                                    <div style="width: 440px; overflow: hidden; border-radius: 30% 30% 0% 0%;">
+                                                                        <img src="${templeImage}" alt="Hindu Community and Cultural Center" style="width: 100%; height: auto;">
+                                                                    </div>
+                                                                </div>
+                                                            </td>
+                                                            <td>
+                                                                <div style="float: right; width: 80%; margin-right: 20px;">
+                                                                    <description>
+                                                                        <p style="font-style: normal; font-size: 15px; text-align: justify; font-family: 'Georgia', serif;">${template.templeDescription}</p>
+                                                                    </description>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                </div>
+                                                <div style="text-align: center; background-color: #ed6f0e; padding: 18px; border-radius: 8px; margin: 10px 10px;">
+                                                    <p style="font-size: 25px; font-weight: bold; color: #ffffff; font-family: 'Georgia', serif, cursive; margin: 0;">Happy Christmas</p>
+                                                </div>
+                                                <table cellspacing="0" cellpadding="0">
+                                                    <tr>
+                                                        <td>
+                                                            <div style="margin-top: 1px; margin-right: 10px; margin-left: 10px; position: relative; display: inline-block;">
+                                                                <a href="http://localhost:3000/video-page" style="position: relative;"><img src="cid:birthday_wishes" alt="Birthday Wishes" style="max-width: 100%; height: auto; border-radius: 10px;"></a>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                                <div style="text-align: center;">
+                                                    <p style="font-family: 'Georgia', serif; text-align: center; font-size: 18px; margin: 0; margin-top: 15px;">Our mission is to make our community a better place. Your support is essential to achieving this goal. Please consider donating today.</p>
+                                                    <table cellspacing="0" cellpadding="0" style="margin: 2% auto;">
+                                                        <tr>
+                                                            <td>
+                                                                <img src="${template.paypalQrCode}" alt="PayPal" style="width: 140px; height: 140px; margin-top: 15px; margin-bottom: 20px;">
+                                                            </td>
+                                                            <td>
+                                                                <img src="${template.zelleQrCode}" alt="Zelle" style="width: 140px; height: 140px; margin-top: 15px; margin-bottom: 20px;">
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                </div>
+                                                <div style="color: black; text-align: center; margin: 10px auto; font-size: 18px; font-family: 'Georgia', serif;">
+                                                    <p>For further details and the latest information:</p>
+                                                    <p>Please visit the temple website <b>${template.websiteUrl}</b></p>
+                                                </div>
+                                                <footer style="padding: 10px; margin-top: 20px;">
+                                                    <div style="text-align: left; font-family: 'Georgia', serif; font-size: 18px; color: #000;">
+                                                        <b>ADDRESS AND OTHER INFORMATION</b><br><br>
+                                                        ${template.address}<br>   
+                                                        Tax ID # ${template.taxId}<br>
+                                                        Phone: ${template.phone}; Fax: ${template.fax}<br>
+                                                        ${template.websiteUrl}<br>
+                                                    </div>
+                                                    <div>
+                                                        <b>Stay Connected:</b>&nbsp;<a href="${template.facebookUrl}"><img src="${BASE_URL}/uploads/facebook.jpg" alt="Facebook" style="width: 40px; height: 40px; margin-top: 10px; border-radius: 10px;"></a>&nbsp;&nbsp;
+                                                        <a href="${template.twitterUrl}"><img src="${BASE_URL}/uploads/twitter.png" alt="Twitter" style="width: 40px; height: 40px; margin-top: 10px; border-radius: 10px;"></a>&nbsp;&nbsp;
+                                                        <a href="${template.instagramUrl}"><img src="${BASE_URL}/uploads/instagram.jpg" alt="Instagram" style="width: 40px; height: 40px; margin-top: 10px; border-radius: 10px;"></a>
+                                                    </div>
+                                                </footer>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
-                        <div style="flex: 2; max-width: 380px; font-family: 'Georgia', serif; color: #333;">
-                            <p>${template.templeDescription}</p>
-                        </div>
-                    </div>
-                </div>
-                <div style="background-color: #1dbffc; padding: 20px; text-align: center; color: white; border-radius: 8px; margin: 20px 0;">
-                    <p style="font-size: 26px; font-weight: bold; margin: 0;">Wishing You a Merry Christmas!</p>
-                    <a href="http://localhost:3000/video-page" style="color: white; text-decoration: none; padding: 12px 25px; background-color: #ff9f32; border-radius: 5px; margin-top: 10px; display: inline-block;">Watch Our Christmas Video</a>
-                </div>
-                <div style="text-align: center; margin: 30px 0;">
-                    <p style="font-size: 18px; color: #333;">Please consider donating to help us make a difference:</p>
-                    <div style="display: flex; justify-content: center; gap: 20px;">
-                        <img src="${template.paypalQrCode}" alt="PayPal" style="width: 120px; height: 120px; margin: 0 15px; border-radius: 10px;">
-                        <img src="${template.zelleQrCode}" alt="Zelle" style="width: 120px; height: 120px; margin: 0 15px; border-radius: 10px;">
-                    </div>
-                </div>
-                <div style="background-color: #eeeeee; padding: 20px; text-align: center; font-size: 14px; color: #777;">
-                    <p style="margin: 5px 0;">For more details, visit our website: <b>${template.websiteUrl}</b></p>
-                    <p style="margin: 5px 0;">Address: ${template.address} | Tax ID: ${template.taxId} | Phone: ${template.phone} | Fax: ${template.fax}</p>
-                    <p style="margin: 5px 0;">Stay Connected:</p>
-                    <div style="display: inline-block;">
-                        <a href="${template.facebookUrl}"><img src="https://via.placeholder.com/40?text=FB" alt="Facebook" style="width: 40px; height: 40px; margin: 0 10px; border-radius: 50%;"></a>
-                        <a href="${template.twitterUrl}"><img src="https://via.placeholder.com/40?text=TW" alt="Twitter" style="width: 40px; height: 40px; margin: 0 10px; border-radius: 50%;"></a>
-                        <a href="${template.instagramUrl}"><img src="https://via.placeholder.com/40?text=IG" alt="Instagram" style="width: 40px; height: 40px; margin: 0 10px; border-radius: 50%;"></a>
-                    </div>
-                </div>
-            </div>
+                    </td>
+                </tr>
+            </table>
         </body>
         </html>`;
 
