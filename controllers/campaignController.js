@@ -1,6 +1,5 @@
 import cloudinary from '../cloudinary/config.js';
 import Campaign from '../models/Campaign.js';
-// const BASE_URL = process.env.BASE_URL || "http://localhost:5000";
 
 // Create a new campaign
 const createCampaign = async (req, res) => {
