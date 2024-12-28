@@ -19,7 +19,6 @@ const dataSchema = Schema({
     temple: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "TempleDetails",
-        required: true
     },
     user: {
         type: mongoose.Schema.Types.ObjectId,

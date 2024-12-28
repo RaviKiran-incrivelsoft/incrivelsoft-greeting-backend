@@ -1,12 +1,12 @@
 import mongoose from 'mongoose';
 
-const campaignSchema = new mongoose.Schema(
+const postSchema = new mongoose.Schema(
   {
-    campaignName: {
+    postName: {
       type: String,
       required: true,
     },
-    campaignDescription: {
+    postDescription: {
       type: String,
       required: true
     },
@@ -27,6 +27,6 @@ const campaignSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const CampaignDetails = mongoose.model('CampaignDetails', campaignSchema);
+const PostDetails = mongoose.model('PostDetails', postSchema);
 
-export default CampaignDetails;
+export default PostDetails;
