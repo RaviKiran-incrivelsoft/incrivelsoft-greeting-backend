@@ -3,38 +3,17 @@ import mongoose from 'mongoose';
 const { Schema } = mongoose;
 
 const dataSchema = new Schema({
-    templeName: {
+    eventName: {
+        type: String,
+        required: true,
+    },
+    eventDate: {
         type: String,
         required: true,
     },
     address: {
         type: String,
         required: true,
-    },
-    taxId: {
-        type: String,
-    },
-    phone: {
-        type: String,
-    },
-    websiteUrl: {
-        type: String,
-        required: true,
-    },
-    facebookUrl: {
-        type: String,
-    },
-    twitterUrl: {
-        type: String,
-    },
-    instagramUrl: {
-        type: String,
-    },
-    paypalQrCodeURL: {
-        type: String,
-    },
-    zelleQrCodeURL: {
-        type: String,
     },
     user: {
         type: mongoose.Schema.Types.ObjectId,
@@ -50,9 +29,8 @@ const dataSchema = new Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "PostDetails"
     }
+});
 
-}, { timestamps: true });
+const CSVUsers = mongoose.model('CSVUsers', dataSchema);
 
-const TempleDetailsModel = mongoose.model('TempleDetails', dataSchema);
-
-export { TempleDetailsModel };
+export { CSVUsers };
