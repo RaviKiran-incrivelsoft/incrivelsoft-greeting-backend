@@ -7,10 +7,6 @@ const dataSchema = new Schema({
         type: String,
         required: true,
     },
-    festivalDecription: {
-        type: String,
-        required: true,
-    },
     festivalDate: {
         type: String,
         required: true
