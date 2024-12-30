@@ -1,51 +1,109 @@
-import fs from "fs";
-import csv from "csv-parser";
 import { TempleDetailsModel } from "../models/TempleData.js";
 import { saveUsers } from "./csvUserController.js";
 import cloudinary from "../cloudinary/config.js";
 
-const createTempleData = async (req, res) => {
+
+function formatDateString(input) {
+    // Regular expression to check the format dd-mm
+    const dateRegex = /^\d{2}-\d{2}$/;
+
+    // If the string is already in the correct format, return it
+    if (dateRegex.test(input)) {
+        return input;
+    }
+
+    // Try to format the string to dd-mm
+    const parts = input.split(/[-\/.]/); // Split on -, /, or .
+    if (parts.length >= 2) {
+        const [day, month] = parts;
+
+        // Ensure day and month are valid numbers
+        if (
+            day.length === 2 &&
+            month.length === 2 &&
+            !isNaN(Number(day)) &&
+            !isNaN(Number(month))
+        ) {
+            return `${day.padStart(2, "0")}-${month.padStart(2, "0")}`;
+        }
+    }
+
+    // If input cannot be formatted, throw an error or return null
+
+    return null;
+}
+
+
+const getTempleData = async (templeId, targetDate = null) => {
     try {
-        const { campaign } = req.query;
-        const user = req.user?.userId; // Ensure user is defined
+        let templeData = null;
+
+        if (targetDate === null) {
+            templeData = await TempleDetailsModel.findById(templeId)
+                .populate([
+                    { path: "csvUser" },
+                    { path: "PostDetails" },
+                ]);
+        }
+        else {
+            templeData = await TempleDetailsModel.findById(templeId)
+                .populate([
+                    { path: "csvUser", match: { birthdate: targetDate } }, // Filter csvUser by birthdate
+                    { path: "PostDetails" },
+                ]);
+        }
+
+        if (!templeData) {
+            return null;
+        }
+        return templeData;
+    } catch (error) {
+        console.log("Error in the getTemplateData, ", error);
+        return null;
+    }
+}
+
+
+
+const createTemple = async (req, res) => {
+    try {
+        const user = req.user?.userId;
         const {
             templeName,
-            templeTitle,
             instagramUrl,
             twitterUrl,
             facebookUrl,
             websiteUrl,
-            templeDescription,
-            fax,
             phone,
             taxId,
             address,
+            csvData,
+            postDetails
         } = req.body;
 
         const requiredFields = {
             templeName,
-            templeTitle,
             instagramUrl,
             twitterUrl,
             facebookUrl,
             websiteUrl,
-            templeDescription,
-            fax,
             phone,
             taxId,
             address,
+            csvData,
+            postDetails
         };
 
         // Check for missing fields
         const missingFields = [];
         Object.keys(requiredFields).forEach((key) => {
-            if (!requiredFields[key]) {
+            if (requiredFields[key] === undefined || requiredFields[key].length === 0) {
                 missingFields.push(key);
             }
         });
 
         // Check for missing files
-        const requiredFiles = ["zelleQrCode", "paypalQrCode", "csvFile"];
+        const requiredFiles = ["zelleQrCode", "paypalQrCode"];
         requiredFiles.forEach((fileKey) => {
             if (!req.files || !req.files[fileKey]) {
                 missingFields.push(fileKey);
@@ -68,148 +126,147 @@ const createTempleData = async (req, res) => {
         requiredFields.campaign = campaign;
         requiredFields.user = user;
 
-        // CSV file path
-        const csvFilePath = req.files.csvFile[0].path;
 
-        console.log("Processing CSV file...");
-
-        // Parse CSV file and process data
-        const results = [];
-        fs.createReadStream(csvFilePath)
-            .pipe(
-                csv({
-                    headers: ["first_name", "last_name", "email", "contact", "birthdate"],
-                })
-            )
-            .on("data", (data) => results.push(data))
-            .on("end", async () => {
-                console.log("CSV file processed. Total rows:", results.length);
-
-                function formatDateString(input) {
-                    // Regular expression to check the format dd-mm
-                    const dateRegex = /^\d{2}-\d{2}$/;
-
-                    // If the string is already in the correct format, return it
-                    if (dateRegex.test(input)) {
-                        return input;
-                    }
-
-                    // Try to format the string to dd-mm
-                    const parts = input.split(/[-\/.]/); // Split on -, /, or .
-                    if (parts.length >= 2) {
-                        const [day, month] = parts;
-
-                        // Ensure day and month are valid numbers
-                        if (
-                            day.length === 2 &&
-                            month.length === 2 &&
-                            !isNaN(Number(day)) &&
-                            !isNaN(Number(month))
-                        ) {
-                            return `${day.padStart(2, "0")}-${month.padStart(2, "0")}`;
-                        }
-                    }
-
-                    // If input cannot be formatted, throw an error or return null
-                    
-                    return null;
-                }
+        // Process and filter valid data
+        const processedData = csvData
+            .map((user) => {
+                const birthdate = formatDateString(user.birthdate);
+                if (!birthdate) return null; // Skip invalid rows
+                return {
+                    first_name: user.first_name,
+                    last_name: user.last_name,
+                    email: user.email,
+                    contact: user.contact,
+                    birthdate,
+                };
+            })
+            .filter(Boolean); // Remove null entries
 
 
-                // Process and filter valid data
-                const processedData = results
-                    .map((user) => {
-                        const birthdate = formatDateString(user.birthdate);
-                        if (!birthdate) return null; // Skip invalid rows
-                        return {
-                            first_name: user.first_name,
-                            last_name: user.last_name,
-                            email: user.email,
-                            contact: user.contact,
-                            birthdate,
-                        };
-                    })
-                    .filter(Boolean); // Remove null entries
+        const ids = await saveUsers(processedData); // Save users to DB
+        requiredFields.csvUser = ids;
+        // Save temple data
+        const templeData = new TempleDetailsModel(requiredFields);
+        await templeData.save();
 
-                try {
-                    const ids = await saveUsers(processedData); // Save users to DB
-                    requiredFields.csvUser = ids;
-                    // Save temple data
-                    const templeData = new TempleDetailsModel(requiredFields);
-                    await templeData.save();
-                    return res
-                        .status(201)
-                        .json({
-                            message: `Temple details saved with ID: ${templeData._id}`,
-                            id: templeData._id
-                        });
-                } catch (error) {
-                    console.error("Error saving data:", error);
-                    return res
-                        .status(500)
-                        .json({ error: "Error processing CSV or saving temple details." });
-                }
-            });
     } catch (error) {
-        console.error("Error in createTempleData:", error);
-        return res.status(500).json({ error: "Internal server error." });
+        console.log("Error in the createTemple, ", error);
+        res.status(500).send({ error: "Internal server error..." })
     }
-};
+}
 
-const deleteTempleData = async (req, res) => {
+const deleteTemple = async (req, res) => {
     try {
         const { id } = req.params;
-        const deleteTempleData = await TempleDetailsModel.findByIdAndDelete(id);
-        if (!deleteTempleData) {
-            return res.status(404).send({ error: `Templa data is not found with id: ${id}` });
+        const deleteTemple = await TempleDetailsModel.findByIdAndDelete(id);
+        if (!deleteTemple) {
+            return res.status(404).send({ error: `Temple data not found with id: ${id}` });
         }
-        res.status(200).send({ message: `Temple Data is deleted having id: ${id}...` });
+        const userIds = deleteTemple.csvUser;
+        res.status(200).send({ message: `Temple data deleted with id: ${id}` });
     } catch (error) {
-        console.error("Error in deleteTempleData:", error);
-        return res.status(500).json({ error: "Internal server error." });
+        console.log("Error in the deleteTemple, ", error);
+        res.status(500).send({ error: "Internal server error..." })
     }
 }
 
-
-const getTempleData = async (templeId, targetDate = null) => {
+const updateTemple = async (req, res) => {
     try {
-        let templeData = null;
+        const { id } = req.params;
+        const {
+            templeName,
+            instagramUrl,
+            twitterUrl,
+            facebookUrl,
+            websiteUrl,
+            phone,
+            taxId,
+            address,
+            csvData,
+            postDetails
+        } = req.body;
 
-        if (targetDate === null) {
-            templeData = await TempleDetailsModel.findById(templeId)
-                .populate([
-                    { path: "csvUser" },
-                    { path: "campaign" },
-                ]);
-        }
-        else {
-            templeData = await TempleDetailsModel.findById(templeId)
-                .populate([
-                    { path: "csvUser", match: { birthdate: targetDate } }, // Filter csvUser by birthdate
-                    { path: "campaign" },
-                ]);
-        }
+        const fieldsToUpdate = {
+            templeName,
+            instagramUrl,
+            twitterUrl,
+            facebookUrl,
+            websiteUrl,
+            phone,
+            taxId,
+            address,
+            postDetails
+        };
 
+
+        Object.keys(fieldsToUpdate).forEach((key) => {
+            if (fieldsToUpdate[key] === undefined || fieldsToUpdate[key].length === 0) {
+                delete fieldsToUpdate[key];
+            }
+        });
+
+        if (req.files && req.files[zelleQrCode]) {
+            const zelleQrCodeURL = await cloudinary.uploader.upload(req.files.zelleQrCode[0].path);
+            fieldsToUpdate.zelleQrCodeURL = zelleQrCodeURL.secure_url
+        }
+        if (req.files && req.files[paypalQrCode]) {
+            const paypalQrCodeURL = await cloudinary.uploader.upload(req.files.paypalQrCode[0].path);
+            fieldsToUpdate.paypalQrCodeURL = paypalQrCodeURL.secure_url
+        }
+        if (csvData.length !== 0) {
+            const processedData = csvData
+                .map((user) => {
+                    const birthdate = formatDateString(user.birthdate);
+                    if (!birthdate) return null; // Skip invalid rows
+                    return {
+                        first_name: user.first_name,
+                        last_name: user.last_name,
+                        email: user.email,
+                        contact: user.contact,
+                        birthdate,
+                    };
+                })
+                .filter(Boolean); // Remove null entries
+
+            const ids = await saveUsers(processedData); // Save users to DB
+            fieldsToUpdate.csvUser = ids;
+        }
+        const updatedPost = await TempleDetailsModel.findByIdAndUpdate(id, fieldsToUpdate, { new: true, runValidators: true });
+        res.status(200).send({ updatedPost });
+
+    } catch (error) {
+        console.log("Error in the updateTemple, ", error);
+        res.status(500).send({ error: "Internal server error..." })
+    }
+}
+
+const getTemple = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const templeData = await TempleDetailsModel.findById(id);
         if (!templeData) {
-            return null;
+            return res.status(404).send({ error: `Temple not found with id:  ${id}.` });
         }
-        return templeData;
+        return res.status(200).send(templeData);
     } catch (error) {
-        console.log("Error in the getTemplateData, ", error);
-        return null;
+        console.log("Error in the createTemple, ", error);
+        res.status(500).send({ error: "Internal server error..." })
     }
 }
 
-const getTemplesDetails = async ( req, res ) => {
+const getAllTemples = async (req, res) => {
     try {
-        const user = req.user.userId;
-        const templesData = await TempleDetailsModel.find({user}).select("_id user campaign templeName");
-        return res.status(200).send({templesData});
+        const { page = 1, limit = 10 } = req.query;
+        const user = req.user?.userId;
+        const skip = (page - 1) * limit;
+        const temples = await TempleDetailsModel.find({ user }).skip(skip).limit(limit);
+        const totalTemples = await TempleDetailsModel.countDocuments({ user });
+
+        res.status(200).send({ totalPages: Math.ceil(totalTemples / limit), temples });
     } catch (error) {
-        console.log("Error in the getTemplesDetails, ", error);
-        return res.status(500).send({error: "Internal Server error..."});
+        console.log("Error in the createTemple, ", error);
+        res.status(500).send({ error: "Internal server error..." })
     }
 }
 
-
-export { createTempleData, deleteTempleData, getTempleData, getTemplesDetails };
+export { getTempleData, createTemple, getAllTemples, getTemple, deleteTemple, updateTemple };

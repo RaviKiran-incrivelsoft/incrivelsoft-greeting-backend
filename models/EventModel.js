@@ -31,6 +31,6 @@ const dataSchema = new Schema({
     }
 });
 
-const CSVUsers = mongoose.model('CSVUsers', dataSchema);
+const EventSchema = mongoose.model('EventSchema', dataSchema);
 
-export { CSVUsers };
+export { EventSchema };
