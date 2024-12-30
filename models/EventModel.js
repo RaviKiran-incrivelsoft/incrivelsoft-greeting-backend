@@ -20,7 +20,7 @@ const dataSchema = new Schema({
         ref: "UserDetails",
         required: true
     },
-    csvUser: {
+    csvData: {
         type: [mongoose.Schema.Types.ObjectId],
         ref: "CSVUsers",
         default: [],
@@ -31,6 +31,6 @@ const dataSchema = new Schema({
     }
 });
 
-const EventSchema = mongoose.model('EventSchema', dataSchema);
+const EventSchema = mongoose.model('EventsGreetings', dataSchema);
 
 export { EventSchema };

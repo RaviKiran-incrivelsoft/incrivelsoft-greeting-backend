@@ -13,10 +13,19 @@ const dataSchema = new Schema({
         type: String,
     },
     contact: {
-        type: String
+        type: String,
     },
     birthdate: {
-        type: String
+        type: String,
+        default: null,
+    },
+    date_month: {
+        type: String,
+        default: null,
+    },
+    ref: {
+        type: String,
+        default: null
     }
 });
 

@@ -2,20 +2,27 @@ import { scheduleSchema } from "../models/Schedule.js";
 
 const createSchedule = async (req, res) => {
     try {
-        const { schedule, time, temple, mode } = req.body;
+        const { schedule, time, temple, marriage, festival, event, birthday, mode } = req.body;
+        const fieldsToSave =  { schedule, time, temple, marriage, festival, event, birthday, mode };
+        Object.keys(fieldsToSave).forEach((key) => {
+            if(fieldsToSave[key] === undefined)
+            {
+                delete fieldsToSave[key];
+            }
+        })
         const user = req.user.userId;
-        const requiredFields = { schedule, temple, mode };
-        const missingFields = Object.keys(requiredFields).filter(key => requiredFields[key] === undefined);
+        fieldsToSave.user = user;
 
-        if (missingFields.length > 0) {
-            return res.status(400).send({ error: `${missingFields.join(", ")} are required...` });
-        }
-        if (schedule === "schedule_later" && !time) {
+        if (fieldsToSave.schedule === "schedule_later" && !fieldsToSave.time) {
             return res.status(400).send({ error: "Time is required for 'schedule_later'." });
         }
-        const saveSchedule = new scheduleSchema({ schedule, time, temple, user, mode });
+        if(!fieldsToSave.mode)
+        {
+            return res.status(400).send({error: "Mode is required..."});
+        }
+        const saveSchedule = new scheduleSchema();
         await saveSchedule.save();
-        res.status(201).send({ message: 'Schedule created Successfully' })
+        res.status(201).send({ message: 'Schedule created Successfully', saveSchedule })
     } catch (error) {
         console.log("Error in the createSchedule, ", error);
         res.status(500).send({ error: "Internal Server error..." });
@@ -24,17 +31,18 @@ const createSchedule = async (req, res) => {
 
 const updateSchedule = async (req, res) => {
     try {
-        const { schedule, time, mode } = req.body;
-        const { id } = req.params;
-        const fieldsToUpdate = {};
-        if (schedule !== undefined) {
-            fieldsToUpdate.schedule = schedule;
-        }
-        if (time !== undefined) {
-            fieldsToUpdate.time = time;
-        }
-        if (mode !== undefined) {
-            fieldsToUpdate.mode = mode;
+        const { schedule, time, temple, marriage, festival, event, birthday, mode } = req.body;
+        const fieldsToUpdate =  { schedule, time, temple, marriage, festival, event, birthday, mode };
+        Object.keys(fieldsToUpdate).forEach((key) => {
+            if(fieldsToUpdate[key] === undefined)
+            {
+                delete fieldsToSave[key];
+            }
+        })
+        
+
+        if (fieldsToUpdate.schedule === "schedule_later" && !fieldsToUpdate.time) {
+            return res.status(400).send({ error: "Time is required for 'schedule_later'." });
         }
         const updateSchedule = await scheduleSchema.findByIdAndUpdate(id, fieldsToUpdate, { new: true, runValidators: true });
         if (!updateSchedule) {
@@ -54,7 +62,7 @@ const getSchedules = async (req, res) => {
         const schedules = await scheduleSchema.find({ user: req.user.userId })
             .skip(skip)
             .limit(limit)
-            .populate('temple', 'templeName templeTitle address templeDescription websiteUrl');
+            .populate('temple');
         const totalSchedules = await scheduleSchema.countDocuments({ user: req.user.userId });
         res.status(200).send({ currentPage: page, totalPages: Math.ceil(totalSchedules / limit), schedules });
     } catch (error) {

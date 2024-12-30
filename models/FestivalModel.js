@@ -24,7 +24,7 @@ const dataSchema = new Schema({
         ref: "UserDetails",
         required: true
     },
-    csvUser: {
+    csvData: {
         type: [mongoose.Schema.Types.ObjectId],
         ref: "CSVUsers",
         default: [],
@@ -35,6 +35,6 @@ const dataSchema = new Schema({
     }
 });
 
-const FestivalSchema = mongoose.model('FestivalSchema', dataSchema);
+const FestivalSchema = mongoose.model('FestivalsGreetings', dataSchema);
 
 export { FestivalSchema };

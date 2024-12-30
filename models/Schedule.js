@@ -16,15 +16,33 @@ const dataSchema = Schema({
         enum: ["whatsapp", "email", "both"],
         default: "email"
     },
-    temple: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "TempleDetails",
-    },
     user: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "UserDetails",
         required: true
+    },
+    temple: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "TempleDetailsGreetings",
+    },
+    birthday: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "BirthDaysGreetings",
+    },
+    event: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "EventsGreetings",
+    },
+    festival: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "FestivalsGreetings",
+    },
+    marriage: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "MarriagesGreetings",
+        required: true
     }
+   
 });
 const scheduleSchema = mongoose.model("ScheduleDetails", dataSchema)
 export {scheduleSchema};

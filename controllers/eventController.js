@@ -14,22 +14,26 @@ const createEvent = async(req, res) => {
                 missingFields.push(key);
             }
         });
-        if(!csvData.length !== 0)
-        {
-            missingFields.push(csvData);
-        }
+        if(csvData === undefined || csvData.length === 0)
+            {
+                missingFields.push(csvData);
+            }
 
-        if(requiredFields.length !== 0)
+        if(requiredFields.length > 0)
         {
             return res.status(400).send({error: `${missingFields} are also required...`});
         }
 
-        const ids = await saveUsers(csvData);
-        requiredFields.csvUser = ids;
+
         requiredFields.user = user;
 
         const saveEvent = new EventSchema(requiredFields);
         await saveEvent.save();
+
+        saveEvent.csvData = await saveUsers(csvData, saveEvent._id);
+
+        await saveEvent.save();
+
         res.status(201).send({saveEvent});
 
     } catch (error) {
@@ -70,7 +74,7 @@ const updateEventDetails = async(req, res) => {
     try {
         const {id} = req.params;
         const {eventName, eventDate, address, postDetails, csvData} = req.body;
-        const fieldsToUpdate = {eventName, eventDate, address, postDetails};
+        const fieldsToUpdate = {eventName, eventDate, address, csvData, postDetails};
         Object.keys(fieldsToUpdate).forEach((key) => {
             if(fieldsToUpdate[key] === undefined)
             {
@@ -79,11 +83,12 @@ const updateEventDetails = async(req, res) => {
         });
         if(csvData.length !== 0)
         {
-            const ids = await saveUsers(csvData);
-            fieldsToUpdate.csvUser = ids;
+            const existingEventDetails = await EventSchema.findById(id);
+            const ids = await saveUsers(csvData, existingEventDetails._id);
+            fieldsToUpdate.csvData = ids;
         }
 
-        const updateMarriageDetails = await FestivalSchema.findByIdAndUpdate(id, fieldsToUpdate, {new: true, runValidators: true});
+        const updateMarriageDetails = await EventSchema.findByIdAndUpdate(id, fieldsToUpdate, {new: true, runValidators: true});
         res.status(200).send({updateMarriageDetails});
     } catch (error) {
         console.log("Error in the updateEventDetails, ", error);

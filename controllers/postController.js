@@ -34,7 +34,7 @@ const getAllPosts = async (req, res) => {
 		const skip = (page - 1) * limit;
 		const posts = await PostModel.find({ userId }).skip(skip).limit(limit);
 		const totalPosts = await PostModel.countDocuments({ userId });
-		res.status(200).send({ currentPage: page, totalPages: Math.ceil(totalPosts / limit), posts: campaigns });
+		res.status(200).send({ currentPage: page, totalPages: Math.ceil(totalPosts / limit), posts: posts });
 	} catch (err) {
 		console.log("Error in the getAllCampaigns, ", err)
 		res.status(500).json({ error: "Internal server error..." });

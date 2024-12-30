@@ -3,25 +3,13 @@ import mongoose from 'mongoose';
 const { Schema } = mongoose;
 
 const dataSchema = new Schema({
-    husband_name: {
+    title: {
         type: String,
         required: true
     },
-    wife_name: {
-        type: String,
-        required: true
-    },
-    email: {
-        type: String,
-        required: true
-    },
-    contact: {
-        type: String,
-        required: true
-    },
-    marriage_date: {
-        type: String,
-        required: true
+    csvData: {
+        type: [mongoose.Schema.Types.ObjectId],
+        ref: "CSVCoupleUsers"
     },
     user: {
         type: mongoose.Schema.Types.ObjectId,
@@ -34,6 +22,6 @@ const dataSchema = new Schema({
     }
 });
 
-const MarriageModel = mongoose.model('MarriageModel', dataSchema);
+const MarriageModel = mongoose.model('MarriagesGreetings', dataSchema);
 
 export { MarriageModel };
