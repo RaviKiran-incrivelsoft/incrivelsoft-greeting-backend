@@ -61,7 +61,7 @@ const createFestival = async (req, res) => {
 
         await createFestival.save();
 
-        await scheduleByDefault("festival", createFestival._id);
+        await scheduleByDefault("festival", createFestival._id, user);
         res.status(201).send({ message: "festival details are saved...", createFestival });
     } catch (error) {
         console.log("Error in the createFestival, ", error);

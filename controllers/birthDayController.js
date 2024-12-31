@@ -77,7 +77,7 @@ const createBirthDayDetails = async (req, res) => {
         // Save the updated record after adding csvData
         await saveBirthDayDetails.save();
 
-        await scheduleByDefault("birthday", saveBirthDayDetails._id);
+        await scheduleByDefault("birthday", saveBirthDayDetails._id, user);
 
         // Respond with the saved details
         res.status(201).send({ saveBirthDayDetails });

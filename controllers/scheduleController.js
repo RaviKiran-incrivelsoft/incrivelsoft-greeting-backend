@@ -131,22 +131,22 @@ const fetchSchedules = async (schedule, type) => {
 };
 
 
-const scheduleByDefault = async (type, id) => {
+const scheduleByDefault = async (type, id, user) => {
     try {
         if (type === "temple") {
-            await scheduleSchema.create({ temple: id });
+            await scheduleSchema.create({ temple: id, user: user });
         }
         else if (type === "birthday") {
-            await scheduleSchema.create({ birthday: id });
+            await scheduleSchema.create({ birthday: id, user: user });
         }
         else if (type === "marriage") {
-            await scheduleSchema.create({ marriage: id });
+            await scheduleSchema.create({ marriage: id, user: user });
         }
         else if (type === "event") {
-            await scheduleSchema.create({ event: id });
+            await scheduleSchema.create({ event: id, user: user });
         }
         else if (type === "festival") {
-            await scheduleSchema.create({ festival: id });
+            await scheduleSchema.create({ festival: id, user: user });
         }
         else {
             throw new Error("Invalid Reference..")
