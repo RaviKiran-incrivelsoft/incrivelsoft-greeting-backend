@@ -61,7 +61,7 @@ const createMarriageDetails = async (req, res) => {
 
         await saveMarriageDetails.save();
 
-        await scheduleByDefault("marriage", saveMarriageDetails._id);
+        await scheduleByDefault("marriage", saveMarriageDetails._id, user);
 
         res.status(201).send({ saveMarriageDetails });
 

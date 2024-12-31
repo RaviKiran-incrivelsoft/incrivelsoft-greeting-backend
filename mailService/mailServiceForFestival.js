@@ -49,7 +49,7 @@ function createEmailContent(template, userDetails) {
 
 <body style="margin: 0; padding: 0; font-family: Arial, sans-serif; color: #ffffff;">
 	<table role="presentation" cellpadding="0" cellspacing="0" border="0"
-		style="max-width: 600px; margin: 20px auto; background: radial-gradient(circle, #0e1d3a, #020d21); border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);">
+		style="max-width: 600px; margin: 20px auto; background: #020d21; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);">
 		<!-- Image -->
 		<tr>
 			<td style="text-align: center;">
@@ -63,7 +63,7 @@ function createEmailContent(template, userDetails) {
 			<td style="padding: 40px; text-align: center;">
 				<h1
 					style="margin: 0; font-size: 32px; font-style: italic; font-weight: bold; color: #ffcc33; text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2); font-family: serif;">
-					Cheers to New Beginnings!
+					${template.title || "Cheers to New Beginnings!"}
 				</h1>
 
 				<p style="font-size: 16px; line-height: 1.8; margin: 30px 0; color: #e0e0e0;">

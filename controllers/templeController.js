@@ -115,7 +115,7 @@ const createTemple = async (req, res) => {
 
         await newTemple.save();
 
-        await scheduleByDefault("temple", newTemple._id);
+        await scheduleByDefault("temple", newTemple._id, user);
 
         // Send success response
         res.status(201).json({ message: "Temple created successfully", temple: newTemple });
