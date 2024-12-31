@@ -2,8 +2,6 @@ import { fetchSchedules } from "../controllers/scheduleController.js";
 import { getTempleData } from "../controllers/templeController.js";
 import sendGreetings from "../mailService/mailServiceForBirthdays.js"
 
-const BASE_URL = process.env.BASE_URL;
-const templeImage = "uploads/santaImage.png";
 
 const getTodayDate = () => {
     const date = new Date();
@@ -17,13 +15,11 @@ const todayDate = getTodayDate();
 const createTempleDetailsTemplate = (templeDetails) => {
 
     const templateJSON = JSON.stringify({
-        templeBanner: `${templeDetails.campaign.mediaURL.replace(/\\/g, '/')}`,
-        templeImage: `${BASE_URL}/${templeImage.replace(/\\/g, '/')}`,
-        templeDescription: templeDetails.templeDescription,
+        templeBanner: `${templeDetails.postDetails.mediaURL.replace(/\\/g, '/')}`,
+        templeDescription: templeDetails.postDetails.postDescription,
         address: templeDetails.address,
         taxId: templeDetails.taxId,
         phone: templeDetails.phone,
-        fax: templeDetails.fax,
         websiteUrl: templeDetails.websiteUrl,
         facebookUrl: templeDetails.facebookUrl,
         twitterUrl: templeDetails.twitterUrl,
@@ -31,16 +27,13 @@ const createTempleDetailsTemplate = (templeDetails) => {
         paypalQrCode: `${templeDetails.paypalQrCodeURL.replace(/\\/g, '/')}`,
         zelleQrCode: `${templeDetails.zelleQrCodeURL.replace(/\\/g, '/')}`
     });
-    // console.log("templateJSON: , ", templateJSON)
-
-    // Parses the JSON object to create a proper JavaScript object
     const template = JSON.parse(templateJSON);
-
+    return template;
 }
 
-const sendMails = async () => {
+const sendAutoMails = async () => {
     try {
-        const schedules = await fetchSchedules("automate");
+        const schedules = await fetchSchedules("automate", "temple");
         if (schedules.length === 0) {
             console.log("Found no automate schedules...");
             return;
@@ -50,19 +43,17 @@ const sendMails = async () => {
             console.log("fetched auto schedule data...", templeData);
             if (templeData) {
                 const template = await createTempleDetailsTemplate(templeData);
-                if(templeData.csvUser === 0)
-                {
+                if (templeData.csvData === 0) {
                     console.log(`No users are found with birthday match with today associated temple Id:${templeData._id} `);
                 }
-                else{
-                    for( const user of templeData.csvUser )
-                        {
-                            console.log(`found user with  birthday, today, ${user.email} `);
-                            await sendGreetings(templeData, user);
-                        }
+                else {
+                    for (const user of templeData.csvData) {
+                        console.log(`found user with  birthday, today, ${user.email} `);
+                        await sendGreetings(template, user);
+                    }
                 }
             }
-            else{
+            else {
                 console.log(`No Templa details found with Id: ${schedule.temple}`)
             }
         }
@@ -70,6 +61,24 @@ const sendMails = async () => {
     } catch (error) {
         console.log("Error in the sendMails, ", error);
     }
-} 
+}
 
-export default sendMails;
+const sendScheduledMails = async (temple) => {
+    try {
+        const templeData = await getTempleData(temple);
+        if (templeData) {
+            const template = await createTempleDetailsTemplate(templeData);
+            for (const user of templeData.csvData) {
+                await sendGreetings(template, user);
+            }
+        }
+        else {
+            console.log(`No Templa details found with Id: ${temple}`)
+        }
+
+    } catch (error) {
+        console.log("Error in the sendMails, ", error);
+    }
+}
+
+export {sendScheduledMails, sendAutoMails};

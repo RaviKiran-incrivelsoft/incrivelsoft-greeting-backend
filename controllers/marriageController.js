@@ -1,6 +1,36 @@
 import { MarriageModel } from "../models/MarriageModel.js";
 import { saveCouples } from "./csvCoupleUserController.js";
 
+
+const getMarriageData = async (marriageId, targetDate = null) => {
+    try {
+        let marriageData = null;
+
+        if (marriageData === null) {
+            marriageData = await MarriageModel.findById(marriageId)
+                .populate([
+                    { path: "csvData" },
+                    { path: "PostDetails" },
+                ]);
+        }
+        else {
+            marriageData = await MarriageModel.findById(marriageId)
+                .populate([
+                    { path: "csvData", match: { date_month: targetDate } }, // Filter csvUser by birthdate
+                    { path: "PostDetails" },
+                ]);
+        }
+
+        if (!marriageData) {
+            return null;
+        }
+        return marriageData;
+    } catch (error) {
+        console.log("Error in the getMarriageData, ", error);
+        return null;
+    }
+}
+
 const createMarriageDetails = async (req, res) => {
     try {
         const { title, csvData, postDetails } = req.body;
@@ -101,4 +131,4 @@ const deleteMarriageDetails = async (req, res) => {
     }
 }
 
-export { createMarriageDetails, getAllMarriageDetails, getMarriageDetails, updateMarriageDetails, deleteMarriageDetails };
+export { createMarriageDetails, getAllMarriageDetails, getMarriageDetails, updateMarriageDetails, deleteMarriageDetails, getMarriageData };

@@ -9,10 +9,10 @@ import userRouter from './routes/userRoutes.js';
 import birthDayRouter from "./routes/birthDayRoutes.js";
 import eventRouter from "./routes/eventRoutes.js";
 import festivalRouter from "./routes/festivalRoutes.js";
-import marriageRouter  from "./routes/marriageRoute.js"
+import marriageRouter from "./routes/marriageRoute.js"
 import { templeRouter } from "./routes/templeRoutes.js";
 import { scheduleRouter } from "./routes/scheduleRoutes.js";
-import { watchSchedules, scheduleJobs } from "./AutoSchedular/scheduleJob.js";
+import { watchSchedules } from "./AutoSchedular/scheduleJob.js";
 
 dotenv.config();
 
@@ -59,10 +59,9 @@ app.listen(port, async () => {
   // Connect to MongoDB
   await connectDB();
   // Start watching the collection for scheduling
-  // await scheduleJobs();
-  // await watchSchedules();
+  await watchSchedules();
+
   const currentDate = new Date();
   currentDate.setMinutes(currentDate.getMinutes() + 5);
-
   console.log(currentDate);
 });

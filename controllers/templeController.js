@@ -10,15 +10,15 @@ const getTempleData = async (templeId, targetDate = null) => {
         if (targetDate === null) {
             templeData = await TempleDetailsModel.findById(templeId)
                 .populate([
-                    { path: "csvUser" },
-                    { path: "PostDetails" },
+                    { path: "csvData" },
+                    { path: "postDetails" },
                 ]);
         }
         else {
             templeData = await TempleDetailsModel.findById(templeId)
                 .populate([
-                    { path: "csvUser", match: { birthdate: targetDate } }, // Filter csvUser by birthdate
-                    { path: "PostDetails" },
+                    { path: "csvData", match: { date_month: targetDate } }, // Filter csvUser by date_month
+                    { path: "postDetails" },
                 ]);
         }
 

@@ -1,6 +1,37 @@
 import { FestivalSchema } from "../models/FestivalModel.js";
 import { saveUsers } from "./csvUserController.js";
 
+
+const getFestivalData = async (festivalId, targetDate = null) => {
+    try {
+        let festivalData = null;
+
+        if (festivalData === null) {
+            festivalData = await FestivalSchema.findById(festivalId)
+                .populate([
+                    { path: "csvData" },
+                    { path: "PostDetails" },
+                ]);
+        }
+        else {
+            festivalData = await FestivalSchema.findById(festivalId)
+                .populate([
+                    { path: "csvData", match: { date_month: targetDate } }, // Filter csvUser by birthdate
+                    { path: "PostDetails" },
+                ]);
+        }
+
+        if (!festivalData) {
+            return null;
+        }
+        return festivalData;
+    } catch (error) {
+        console.log("Error in the getFestivalData, ", error);
+        return null;
+    }
+}
+
+
 const createFestival = async (req, res) => {
     try {
         const { festivalName, festivalDate, from, csvData, address, postDetails } = req.body;
@@ -103,4 +134,4 @@ const deleteFestivalDetils = async (req, res) => {
     }
 }
 
-export { createFestival, getFestival, getAllFestivalDetails, updateFestivalDetails, deleteFestivalDetils };
+export { createFestival, getFestival, getAllFestivalDetails, updateFestivalDetails, deleteFestivalDetils, getFestivalData    };

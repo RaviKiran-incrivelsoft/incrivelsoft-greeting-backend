@@ -40,7 +40,6 @@ const dataSchema = Schema({
     marriage: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "MarriagesGreetings",
-        required: true
     }
    
 });

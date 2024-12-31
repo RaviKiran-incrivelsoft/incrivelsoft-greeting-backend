@@ -15,10 +15,10 @@ const saveUsersWithBirthDay = async (data, ref) => {
             throw new Error("Expected an array of users but received: " + typeof csvData);
         }
 
-        console.log("CSVUsers:", csvData);
 
         const processedData = csvData.map((user) => {
             const birthdate = formatDateString(user.birthdate);
+            console.log("birthday extract and format, ", birthdate);
             if (!birthdate) return null;
             return {
                 first_name: user.first_name,
@@ -26,7 +26,7 @@ const saveUsersWithBirthDay = async (data, ref) => {
                 email: user.email,
                 contact: user.contact,
                 birthdate: user.birthdate,
-                birth_day_month: birthdate,
+                date_month: birthdate,
                 ref: ref
             };
         }).filter(Boolean);

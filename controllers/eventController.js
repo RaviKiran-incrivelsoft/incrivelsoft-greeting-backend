@@ -1,6 +1,35 @@
 import {EventSchema} from "../models/EventModel.js";
 import { saveUsers } from "./csvUserController.js";
 
+const getEventData = async (eventId, targetDate = null) => {
+    try {
+        let eventData = null;
+
+        if (eventData === null) {
+            eventData = await EventSchema.findById(eventId)
+                .populate([
+                    { path: "csvData" },
+                    { path: "PostDetails" },
+                ]);
+        }
+        else {
+            eventData = await EventSchema.findById(eventId)
+                .populate([
+                    { path: "csvData", match: { date_month: targetDate } }, // Filter csvUser by birthdate
+                    { path: "PostDetails" },
+                ]);
+        }
+
+        if (!eventData) {
+            return null;
+        }
+        return eventData;
+    } catch (error) {
+        console.log("Error in the getEventData, ", error);
+        return null;
+    }
+}
+
 const createEvent = async(req, res) => {
     try {
         const {eventName, eventDate, address, postDetails, csvData} = req.body;
@@ -111,4 +140,4 @@ const deleteEventDetails = async(req, res) => {
     }
 }
 
-export {createEvent, getAllEventDetails, getEventDetails, updateEventDetails, deleteEventDetails};
+export {createEvent, getAllEventDetails, getEventDetails, updateEventDetails, deleteEventDetails, getEventData};

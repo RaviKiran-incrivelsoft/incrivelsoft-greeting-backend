@@ -1,10 +1,40 @@
 import {BirthDayModel} from "../models/BirthDayModel.js";
 import { saveUsersWithBirthDay } from "./csvUserController.js";
 
+
+const getBirthDayData = async (birthDayId, targetDate = null) => {
+    try {
+        let birthDayData = null;
+
+        if (birthDayData === null) {
+            birthDayData = await BirthDayModel.findById(birthDayId)
+                .populate([
+                    { path: "csvData" },
+                    { path: "PostDetails" },
+                ]);
+        }
+        else {
+            birthDayData = await BirthDayModel.findById(birthDayId)
+                .populate([
+                    { path: "csvData", match: { date_month: targetDate } }, // Filter csvUser by birthdate
+                    { path: "PostDetails" },
+                ]);
+        }
+
+        if (!birthDayData) {
+            return null;
+        }
+        return birthDayData;
+    } catch (error) {
+        console.log("Error in the getBirthDayData, ", error);
+        return null;
+    }
+}
+
 const createBirthDayDetails = async (req, res) => {
     try {
         const { title, from, csvData, postDetails } = req.body;
-        console.log("Request body:", req.body);
+        // console.log("Request body:", req.body);
 
         // Ensure `req.user` exists and is populated
         const user = req.user?.userId;
@@ -122,4 +152,4 @@ const deleteBirthDayDetails = async(req, res) => {
     }
 }
 
-export {createBirthDayDetails, getAllBirthDayDetails, getBirthDayDetails, updateBirthDayDetails, deleteBirthDayDetails};
+export {createBirthDayDetails, getAllBirthDayDetails, getBirthDayDetails, updateBirthDayDetails, deleteBirthDayDetails, getBirthDayData};

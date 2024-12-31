@@ -25,7 +25,7 @@ const saveCouples= async (data, ref) => {
                 email: user.email,
                 contact: user.contact,
                 marriagedate: user.marriagedate,
-                marriage_date_month: marriagedate,
+                date_month: marriagedate,
                 ref: ref
             };
         })
