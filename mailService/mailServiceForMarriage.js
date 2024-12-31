@@ -62,7 +62,7 @@ function createEmailContent(template, userDetails, age) {
 		</tr>
 		<!-- Anniversary Title and Couple Names -->
 		<tr>
-			<td style="padding: 20px; text-align: center; color: #ffffff;">
+			<td style="padding: 20px 0px; text-align: center; color: #ffffff;">
 				<h1
 					style="margin: 0; font-size: 40px; font-weight: bold; color: #e7afb5; text-align: center; text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);">
 					${template.title || "Happy Anniversary"}</h1>
