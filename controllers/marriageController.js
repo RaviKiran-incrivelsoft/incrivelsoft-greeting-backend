@@ -1,5 +1,6 @@
 import { MarriageModel } from "../models/MarriageModel.js";
 import { saveCouples } from "./csvCoupleUserController.js";
+import {scheduleByDefault} from "./scheduleController.js"
 
 
 const getMarriageData = async (marriageId, targetDate = null) => {
@@ -60,7 +61,10 @@ const createMarriageDetails = async (req, res) => {
 
         await saveMarriageDetails.save();
 
+        await scheduleByDefault("marriage", aveMarriageDetails._id);
+
         res.status(201).send({ saveMarriageDetails });
+
 
     } catch (error) {
         console.log("Error in the createMarriageDetails, ", error);

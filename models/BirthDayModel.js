@@ -25,7 +25,7 @@ const dataSchema = new Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "PostDetails"
     }
-});
+}, { timestamps: true });
 
 const BirthDayModel = mongoose.model('BirthDaysGreetings', dataSchema);
 

@@ -3,10 +3,9 @@ import { scheduleSchema } from "../models/Schedule.js";
 const createSchedule = async (req, res) => {
     try {
         const { schedule, time, temple, marriage, festival, event, birthday, mode } = req.body;
-        const fieldsToSave =  { schedule, time, temple, marriage, festival, event, birthday, mode };
+        const fieldsToSave = { schedule, time, temple, marriage, festival, event, birthday, mode };
         Object.keys(fieldsToSave).forEach((key) => {
-            if(fieldsToSave[key] === undefined)
-            {
+            if (fieldsToSave[key] === undefined) {
                 delete fieldsToSave[key];
             }
         })
@@ -17,9 +16,8 @@ const createSchedule = async (req, res) => {
         if (fieldsToSave.schedule === "schedule_later" && !fieldsToSave.time) {
             return res.status(400).send({ error: "Time is required for 'schedule_later'." });
         }
-        if(!fieldsToSave.mode)
-        {
-            return res.status(400).send({error: "Mode is required..."});
+        if (!fieldsToSave.mode) {
+            return res.status(400).send({ error: "Mode is required..." });
         }
         const saveSchedule = new scheduleSchema(fieldsToSave);
         await saveSchedule.save();
@@ -33,15 +31,14 @@ const createSchedule = async (req, res) => {
 const updateSchedule = async (req, res) => {
     try {
         const { schedule, time, temple, marriage, festival, event, birthday, mode } = req.body;
-        const {id} = req.params;
-        const fieldsToUpdate =  { schedule, time, temple, marriage, festival, event, birthday, mode };
+        const { id } = req.params;
+        const fieldsToUpdate = { schedule, time, temple, marriage, festival, event, birthday, mode };
         Object.keys(fieldsToUpdate).forEach((key) => {
-            if(fieldsToUpdate[key] === undefined)
-            {
+            if (fieldsToUpdate[key] === undefined) {
                 delete fieldsToUpdate[key];
             }
         })
-        
+
 
         if (fieldsToUpdate.schedule === "schedule_later" && !fieldsToUpdate.time) {
             return res.status(400).send({ error: "Time is required for 'schedule_later'." });
@@ -134,4 +131,30 @@ const fetchSchedules = async (schedule, type) => {
 };
 
 
-export { createSchedule, updateSchedule, getSchedules, deleteSchedule, fetchSchedules };
+const scheduleByDefault = async (type, id) => {
+    try {
+        if (type === "temple") {
+            await scheduleSchema.create({ temple: id });
+        }
+        else if (type === "birthday") {
+            await scheduleSchema.create({ birthday: id });
+        }
+        else if (type === "marriage") {
+            await scheduleSchema.create({ marriage: id });
+        }
+        else if (type === "event") {
+            await scheduleSchema.create({ event: id });
+        }
+        else if (type === "festival") {
+            await scheduleSchema.create({ festival: id });
+        }
+        else {
+            throw new Error("Invalid Reference..")
+        }
+
+    } catch (error) {
+        console.log("Error in the scheduleByDefault, ", error);
+    }
+}
+
+export { createSchedule, updateSchedule, getSchedules, deleteSchedule, fetchSchedules, scheduleByDefault };

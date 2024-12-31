@@ -1,5 +1,6 @@
 import { FestivalSchema } from "../models/FestivalModel.js";
 import { saveUsers } from "./csvUserController.js";
+import {scheduleByDefault} from "./scheduleController.js"
 
 
 const getFestivalData = async (festivalId, targetDate = null) => {
@@ -35,6 +36,7 @@ const getFestivalData = async (festivalId, targetDate = null) => {
 const createFestival = async (req, res) => {
     try {
         const { festivalName, festivalDate, from, csvData, address, postDetails } = req.body;
+        console.log(req.body)
         const requiredFields = { festivalName, festivalDate, from, address, postDetails };
         const user = req.user?.userId;
         const missingFields = [];
@@ -58,6 +60,8 @@ const createFestival = async (req, res) => {
         createFestival.csvData = await saveUsers(csvData, createFestival._id);
 
         await createFestival.save();
+
+        await scheduleByDefault("festival", createFestival._id);
         res.status(201).send({ message: "festival details are saved...", createFestival });
     } catch (error) {
         console.log("Error in the createFestival, ", error);

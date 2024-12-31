@@ -1,6 +1,7 @@
 import { TempleDetailsModel } from "../models/TempleData.js";
 import { saveUsersWithBirthDay } from "./csvUserController.js";
 import cloudinary from "../cloudinary/config.js";
+import {scheduleByDefault} from "./scheduleController.js"
 
 
 const getTempleData = async (templeId, targetDate = null) => {
@@ -113,6 +114,8 @@ const createTemple = async (req, res) => {
         newTemple.csvData = await saveUsersWithBirthDay(csvData, newTemple._id);
 
         await newTemple.save();
+
+        await scheduleByDefault("temple", newTemple._id);
 
         // Send success response
         res.status(201).json({ message: "Temple created successfully", temple: newTemple });
