@@ -9,14 +9,14 @@ const getEventData = async (eventId, targetDate = null) => {
             eventData = await EventSchema.findById(eventId)
                 .populate([
                     { path: "csvData" },
-                    { path: "PostDetails" },
+                    { path: "postDetails" },
                 ]);
         }
         else {
             eventData = await EventSchema.findById(eventId)
                 .populate([
                     { path: "csvData", match: { date_month: targetDate } }, // Filter csvUser by birthdate
-                    { path: "PostDetails" },
+                    { path: "postDetails" },
                 ]);
         }
 

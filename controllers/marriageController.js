@@ -10,14 +10,14 @@ const getMarriageData = async (marriageId, targetDate = null) => {
             marriageData = await MarriageModel.findById(marriageId)
                 .populate([
                     { path: "csvData" },
-                    { path: "PostDetails" },
+                    { path: "postDetails" },
                 ]);
         }
         else {
             marriageData = await MarriageModel.findById(marriageId)
                 .populate([
                     { path: "csvData", match: { date_month: targetDate } }, // Filter csvUser by birthdate
-                    { path: "PostDetails" },
+                    { path: "postDetails" },
                 ]);
         }
 

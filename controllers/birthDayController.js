@@ -10,14 +10,14 @@ const getBirthDayData = async (birthDayId, targetDate = null) => {
             birthDayData = await BirthDayModel.findById(birthDayId)
                 .populate([
                     { path: "csvData" },
-                    { path: "PostDetails" },
+                    { path: "postDetails" },
                 ]);
         }
         else {
             birthDayData = await BirthDayModel.findById(birthDayId)
                 .populate([
                     { path: "csvData", match: { date_month: targetDate } }, // Filter csvUser by birthdate
-                    { path: "PostDetails" },
+                    { path: "postDetails" },
                 ]);
         }
 

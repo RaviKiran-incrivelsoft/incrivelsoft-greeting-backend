@@ -1,6 +1,7 @@
 import schedule from 'node-schedule';
 import { scheduleSchema } from '../models/Schedule.js';
-import { sendScheduledMails, sendAutoMails } from "../utils/templeUtils.js";
+import { sendScheduledMailsFromTemple, sendAutoMailsFromTemple } from "../utils/templeUtils.js";
+import { sendScheduledMailsFromFestival } from "../utils/festivalUtils.js"
 
 
 const scheduleJobs = (job) => {
@@ -49,62 +50,62 @@ const handleJobExecution = async (job) => {
         switch (fieldToPopulate) {
             case "temple":
                 if (job.mode === "email") {
-                    await sendScheduledMails(job.temple);
+                    await sendScheduledMailsFromTemple(job.temple);
                 }
                 else if (job.mode === "whatsapp") {
                     console.log("Whatsapp not yet implemented...");
                 }
                 else {
-                    await sendScheduledMails(job.temple);
+                    await sendScheduledMailsFromTemple(job.temple);
                     console.log("Whatsapp not yet implemented...");
                 }
 
                 break;
             case "birthday":
                 if (job.mode === "email") {
-                    await sendScheduledMails(job.temple);
+                    await sendScheduledMailsFromTemple(job.temple);
                 }
                 else if (job.mode === "whatsapp") {
                     console.log("Whatsapp not yet implemented...");
                 }
                 else {
-                    await sendScheduledMails(job.temple);
+                    await sendScheduledMailsFromTemple(job.temple);
                     console.log("Whatsapp not yet implemented...");
                 }
                 break;
             case "event":
                 if (job.mode === "email") {
-                    await sendScheduledMails(job.temple);
+                    await sendScheduledMailsFromTemple(job.temple);
                 }
                 else if (job.mode === "whatsapp") {
                     console.log("Whatsapp not yet implemented...");
                 }
                 else {
-                    await sendScheduledMails(job.temple);
+                    await sendScheduledMailsFromTemple(job.temple);
                     console.log("Whatsapp not yet implemented...");
                 }
                 break;
             case "festival":
                 if (job.mode === "email") {
-                    await sendScheduledMails(job.temple);
+                    await sendScheduledMailsFromFestival(job.festival);
                 }
                 else if (job.mode === "whatsapp") {
                     console.log("Whatsapp not yet implemented...");
                 }
                 else {
-                    await sendScheduledMails(job.temple);
+                    sendScheduledMailsFromFestival(job.festival);
                     console.log("Whatsapp not yet implemented...");
                 }
                 break;
             case "marriage":
                 if (job.mode === "email") {
-                    await sendScheduledMails(job.temple);
+                    await sendScheduledMailsFromTemple(job.temple);
                 }
                 else if (job.mode === "whatsapp") {
                     console.log("Whatsapp not yet implemented...");
                 }
                 else {
-                    await sendScheduledMails(job.temple);
+                    await sendScheduledMailsFromTemple(job.temple);
                     console.log("Whatsapp not yet implemented...");
                 }
                 break;
@@ -160,6 +161,6 @@ export const watchSchedules = async () => {
 
 schedule.scheduleJob('26 09 * * *', async () => {
     console.log('Scheduled job triggered at:', new Date());
-    sendAutoMails();
+    sendAutoMailsFromTemple();
 
 });

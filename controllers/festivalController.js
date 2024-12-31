@@ -10,14 +10,14 @@ const getFestivalData = async (festivalId, targetDate = null) => {
             festivalData = await FestivalSchema.findById(festivalId)
                 .populate([
                     { path: "csvData" },
-                    { path: "PostDetails" },
+                    { path: "postDetails" },
                 ]);
         }
         else {
             festivalData = await FestivalSchema.findById(festivalId)
                 .populate([
                     { path: "csvData", match: { date_month: targetDate } }, // Filter csvUser by birthdate
-                    { path: "PostDetails" },
+                    { path: "postDetails" },
                 ]);
         }
 
