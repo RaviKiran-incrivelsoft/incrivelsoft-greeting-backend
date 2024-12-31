@@ -72,7 +72,7 @@ function createEmailContent(template, userDetails) {
 
 				<!-- Address Section -->
 				<p style="font-size: 14px; margin: 20px; color: #c0c0c0; line-height: 1.5;">
-					Whether you're celebrating this special moment with loved ones at home or creating unforgettable memories elsewhere, we send our heartfelt wishes to you and yours. Remember, we're always here to support you at <span style="color: #ffcc33;">${template.date}, ${template.address}</span>
+					Whether you're celebrating this special moment with loved ones at home or creating unforgettable memories elsewhere, we send our heartfelt wishes to you and yours.
 
 				</p>
 
