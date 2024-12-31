@@ -40,12 +40,12 @@ const createMarriageDetails = async (req, res) => {
         const missingFields = [];
 
         Object.keys(requiredFields).forEach((key) => {
-            if (requiredFields[key] === undefined || requiredFields[key].length === 0) {
+            if (!requiredFields[key] || requiredFields[key].length === 0) {
                 missingFields.push(key);
             }
         });
 
-        if (csvData === undefined || csvData.length === 0) {
+        if (!csvData || csvData.length === 0) {
             missingFields.push(csvData);
         }
 

@@ -7,6 +7,15 @@ export default function formatDateString(input) {
         return input;
     }
 
+    // Regular expression to check for yyyy-mm-dd format
+    const dateRegexISO = /^\d{4}-\d{2}-\d{2}$/;
+
+    // If the string is in yyyy-mm-dd format, convert it to dd-mm
+    if (dateRegexISO.test(input)) {
+        const [year, month, day] = input.split('-');
+        return `${day.padStart(2, '0')}-${month.padStart(2, '0')}`;
+    }
+
     // Try to format the string to dd-mm by splitting on common delimiters (-, /, .)
     const parts = input.split(/[-\/.]/);
     if (parts.length >= 2) {

@@ -3,7 +3,7 @@ import PostModel from '../models/PostModel.js';
 
 // Create a new post
 const createPost = async (req, res) => {
-	const { postName, postDescription } = req.body;
+	const { postName, postDescription, type } = req.body;
 	const userId = req.user.userId;
 	if (!postDescription || !postName) {
 		return res.status(400).send({ error: "postName, postDescription are required..." });
@@ -11,13 +11,17 @@ const createPost = async (req, res) => {
 	if (!req.file) {
 		return res.status(400).send({ error: "Image or Video is required..." });
 	}
+	const validTypes = ["birthday", "event", "temple", "anniversary", "occasion"];
+	if (type && !validTypes.includes(type)) {
+		return res.status(400).send({ error: `Invalid type. Valid types are: ${validTypes.join(", ")}` });
+	}
 	try {
 		const result = await cloudinary.uploader.upload(req.file.path, {
 			resource_type: req.file.mimetype.startsWith("video") ? "video" : "image",
 		});
 
 		const mediaURL = result.secure_url;
-		const newPost = new PostModel({ postDescription, postName, userId, mediaURL });
+		const newPost = new PostModel({ postDescription, postName, userId, mediaURL, type: type || null, isGlobal: false, });
 		const savedPost = await newPost.save();
 		res.status(201).json(savedPost);
 	} catch (err) {
