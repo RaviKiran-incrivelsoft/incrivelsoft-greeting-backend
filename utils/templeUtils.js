@@ -66,6 +66,7 @@ const sendAutoMailsFromTemple = async () => {
 const sendScheduledMailsFromTemple = async (temple) => {
     try {
         const templeData = await getTempleData(temple);
+        console.log("temple data: ", templeData);
         if (templeData) {
             const template = await createTempleDetailsTemplate(templeData);
             for (const user of templeData.csvData) {
