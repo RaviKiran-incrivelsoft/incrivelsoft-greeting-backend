@@ -1,5 +1,6 @@
 import {BirthDayModel} from "../models/BirthDayModel.js";
 import { saveUsersWithBirthDay } from "./csvUserController.js";
+import {scheduleByDefault} from "./scheduleController.js"
 
 
 const getBirthDayData = async (birthDayId, targetDate = null) => {
@@ -10,14 +11,14 @@ const getBirthDayData = async (birthDayId, targetDate = null) => {
             birthDayData = await BirthDayModel.findById(birthDayId)
                 .populate([
                     { path: "csvData" },
-                    { path: "PostDetails" },
+                    { path: "postDetails" },
                 ]);
         }
         else {
             birthDayData = await BirthDayModel.findById(birthDayId)
                 .populate([
                     { path: "csvData", match: { date_month: targetDate } }, // Filter csvUser by birthdate
-                    { path: "PostDetails" },
+                    { path: "postDetails" },
                 ]);
         }
 
@@ -75,6 +76,8 @@ const createBirthDayDetails = async (req, res) => {
 
         // Save the updated record after adding csvData
         await saveBirthDayDetails.save();
+
+        await scheduleByDefault("birthday", saveBirthDayDetails._id);
 
         // Respond with the saved details
         res.status(201).send({ saveBirthDayDetails });

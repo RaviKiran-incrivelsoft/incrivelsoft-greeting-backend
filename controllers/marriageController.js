@@ -1,5 +1,6 @@
 import { MarriageModel } from "../models/MarriageModel.js";
 import { saveCouples } from "./csvCoupleUserController.js";
+import {scheduleByDefault} from "./scheduleController.js"
 
 
 const getMarriageData = async (marriageId, targetDate = null) => {
@@ -10,14 +11,14 @@ const getMarriageData = async (marriageId, targetDate = null) => {
             marriageData = await MarriageModel.findById(marriageId)
                 .populate([
                     { path: "csvData" },
-                    { path: "PostDetails" },
+                    { path: "postDetails" },
                 ]);
         }
         else {
             marriageData = await MarriageModel.findById(marriageId)
                 .populate([
                     { path: "csvData", match: { date_month: targetDate } }, // Filter csvUser by birthdate
-                    { path: "PostDetails" },
+                    { path: "postDetails" },
                 ]);
         }
 
@@ -60,7 +61,10 @@ const createMarriageDetails = async (req, res) => {
 
         await saveMarriageDetails.save();
 
+        await scheduleByDefault("marriage", aveMarriageDetails._id);
+
         res.status(201).send({ saveMarriageDetails });
+
 
     } catch (error) {
         console.log("Error in the createMarriageDetails, ", error);

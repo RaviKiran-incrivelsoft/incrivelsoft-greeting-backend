@@ -5,7 +5,8 @@ const { Schema } = mongoose;
 const dataSchema = Schema({
     schedule: {
         type: String,
-        enum: ["schedule_now", "schedule_later", "pause", "completed", "automate"]
+        enum: ["schedule_now", "schedule_later", "pause", "completed", "automate"],
+        default: "schedule"
     },
     time: {
         type: Date,
@@ -42,6 +43,6 @@ const dataSchema = Schema({
         ref: "MarriagesGreetings",
     }
    
-});
+}, {timestamps: true});
 const scheduleSchema = mongoose.model("ScheduleDetails", dataSchema)
 export {scheduleSchema};

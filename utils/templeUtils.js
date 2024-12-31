@@ -1,6 +1,6 @@
 import { fetchSchedules } from "../controllers/scheduleController.js";
 import { getTempleData } from "../controllers/templeController.js";
-import sendGreetings from "../mailService/mailServiceForBirthdays.js"
+import sendGreetings from "../mailService/mailServiceForTempleBirthdays.js"
 
 
 const getTodayDate = () => {
@@ -31,7 +31,7 @@ const createTempleDetailsTemplate = (templeDetails) => {
     return template;
 }
 
-const sendAutoMails = async () => {
+const sendAutoMailsFromTemple = async () => {
     try {
         const schedules = await fetchSchedules("automate", "temple");
         if (schedules.length === 0) {
@@ -63,7 +63,7 @@ const sendAutoMails = async () => {
     }
 }
 
-const sendScheduledMails = async (temple) => {
+const sendScheduledMailsFromTemple = async (temple) => {
     try {
         const templeData = await getTempleData(temple);
         if (templeData) {
@@ -81,4 +81,4 @@ const sendScheduledMails = async (temple) => {
     }
 }
 
-export {sendScheduledMails, sendAutoMails};
+export {sendScheduledMailsFromTemple, sendAutoMailsFromTemple};

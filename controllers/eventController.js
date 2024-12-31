@@ -1,5 +1,6 @@
 import {EventSchema} from "../models/EventModel.js";
 import { saveUsers } from "./csvUserController.js";
+import {scheduleByDefault} from "./scheduleController.js"
 
 const getEventData = async (eventId, targetDate = null) => {
     try {
@@ -9,14 +10,14 @@ const getEventData = async (eventId, targetDate = null) => {
             eventData = await EventSchema.findById(eventId)
                 .populate([
                     { path: "csvData" },
-                    { path: "PostDetails" },
+                    { path: "postDetails" },
                 ]);
         }
         else {
             eventData = await EventSchema.findById(eventId)
                 .populate([
                     { path: "csvData", match: { date_month: targetDate } }, // Filter csvUser by birthdate
-                    { path: "PostDetails" },
+                    { path: "postDetails" },
                 ]);
         }
 
@@ -62,6 +63,8 @@ const createEvent = async(req, res) => {
         saveEvent.csvData = await saveUsers(csvData, saveEvent._id);
 
         await saveEvent.save();
+
+        await scheduleByDefault("event", saveEvent._id);
 
         res.status(201).send({saveEvent});
 
