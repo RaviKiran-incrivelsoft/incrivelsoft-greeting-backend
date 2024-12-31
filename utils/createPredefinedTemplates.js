@@ -36,13 +36,13 @@ const predefinedTemplates = [
 	// 	type: "festival",
 	// 	isGlobal: true,
 	// },
-	// {
-	// 	postName: "Temple Information",
-	// 	postDescription: "Share details about temple events and activities.",
-	// 	mediaURL: "https://example.com/temple-template.jpg",
-	// 	type: "temple",
-	// 	isGlobal: true,
-	// },
+	{
+		postName: "Temple Information",
+		postDescription: "Celebrate your special day with our exclusive birthday template",
+		mediaURL: "https://res.cloudinary.com/dnl1wajhw/image/upload/v1735657868/duyp9meidk3cji7zrqdm.png",
+		type: "temple",
+		isGlobal: true,
+	},
 ];
 
 const createPredefinedTemplates = async () => {

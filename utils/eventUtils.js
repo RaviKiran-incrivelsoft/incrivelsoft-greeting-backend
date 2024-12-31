@@ -12,6 +12,7 @@ const createTemplate = (details) => {
     });
     const template = JSON.parse(templateJSON);
     return template;
+    
 }
 
 

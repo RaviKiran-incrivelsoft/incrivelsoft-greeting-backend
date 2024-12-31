@@ -58,7 +58,7 @@ const getSchedules = async (req, res) => {
     try {
         // Extract query parameters and convert to numbers
         const page = parseInt(req.query.page, 10) || 1;
-        const limit = parseInt(req.query.limit, 10) || 10;
+        const limit = parseInt(req.query.limit, 10) || 40
         const skip = (page - 1) * limit;
 
         // Ensure the user is authenticated
