@@ -13,6 +13,7 @@ import marriageRouter from "./routes/marriageRoute.js"
 import { templeRouter } from "./routes/templeRoutes.js";
 import { scheduleRouter } from "./routes/scheduleRoutes.js";
 import { watchSchedules } from "./AutoSchedular/scheduleJob.js";
+import createPredefinedTemplates from "./utils/createPredefinedTemplates.js";
 
 dotenv.config();
 
@@ -60,6 +61,8 @@ app.listen(port, async () => {
   await connectDB();
   // Start watching the collection for scheduling
   await watchSchedules();
+  // Create predefined templates
+  await createPredefinedTemplates();
 
   const currentDate = new Date();
   currentDate.setMinutes(currentDate.getMinutes() + 5);

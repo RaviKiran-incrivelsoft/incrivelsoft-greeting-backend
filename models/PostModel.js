@@ -19,9 +19,19 @@ const postSchema = new mongoose.Schema(
       enum: ["active", "inactive"],
       default: 'active',
     },
+    type: {
+      type: String,
+      enum: ["birthday", "festival", "anniversary", "event", "occasion", "temple"],
+      required: true,
+    },
+    isGlobal: {
+      type: Boolean,
+      default: false,
+    },
     userId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "UserDetails"
+      ref: "UserDetails",
+      default: null,
     }
   },
   { timestamps: true }

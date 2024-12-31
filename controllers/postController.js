@@ -32,8 +32,8 @@ const getAllPosts = async (req, res) => {
 		const { page = 1, limit = 10 } = req.query;
 		const userId = req.user.userId;
 		const skip = (page - 1) * limit;
-		const posts = await PostModel.find({ userId }).skip(skip).limit(limit);
-		const totalPosts = await PostModel.countDocuments({ userId });
+		const posts = await PostModel.find({ $or: [{ userId }, { isGlobal: true }] }).skip(skip).limit(limit);
+		const totalPosts = await PostModel.countDocuments({ $or: [{ userId }, { isGlobal: true }] });
 		res.status(200).send({ currentPage: page, totalPages: Math.ceil(totalPosts / limit), posts: posts });
 	} catch (err) {
 		console.log("Error in the getAllCampaigns, ", err)
