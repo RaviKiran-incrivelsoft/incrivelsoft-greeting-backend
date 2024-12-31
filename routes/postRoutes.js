@@ -3,13 +3,13 @@ import {createPost, getAllPosts, getPostById, updatePost, deletePost} from "../c
 import {configureFileUpload} from '../middleware/fileStorage.js';
 import {authMiddleware} from '../middleware/authMiddleware.js';
 
-const router = express.Router();
+const postRouter = express.Router();
 const uploadSingleFile = configureFileUpload(true, "media");
 
-router.post('/', authMiddleware, uploadSingleFile, createPost);
-router.get('/', authMiddleware, getAllPosts);
-router.get('/:id', authMiddleware, getPostById);
-router.put('/:id', authMiddleware, uploadSingleFile, updatePost);
-router.delete('/:id', authMiddleware, deletePost);
+postRouter.post('/', authMiddleware, uploadSingleFile, createPost);
+postRouter.get('/', authMiddleware, getAllPosts);
+postRouter.get('/:id', authMiddleware, getPostById);
+postRouter.put('/:id', authMiddleware, uploadSingleFile, updatePost);
+postRouter.delete('/:id', authMiddleware, deletePost);
 
-export default router;
+export default postRouter;

@@ -16,7 +16,7 @@ const dataSchema = new Schema({
         ref: "UserDetails",
         required: true
     },
-    csvUser: {
+    csvData: {
         type: [mongoose.Schema.Types.ObjectId],
         ref: "CSVUsers",
         default: [],
@@ -27,6 +27,6 @@ const dataSchema = new Schema({
     }
 });
 
-const BirthDayModel = mongoose.model('BirthDayModel', dataSchema);
+const BirthDayModel = mongoose.model('BirthDaysGreetings', dataSchema);
 
 export { BirthDayModel };

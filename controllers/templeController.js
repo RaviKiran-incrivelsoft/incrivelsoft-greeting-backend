@@ -1,37 +1,6 @@
 import { TempleDetailsModel } from "../models/TempleData.js";
-import { saveUsers } from "./csvUserController.js";
+import { saveUsersWithBirthDay } from "./csvUserController.js";
 import cloudinary from "../cloudinary/config.js";
-
-
-function formatDateString(input) {
-    // Regular expression to check the format dd-mm
-    const dateRegex = /^\d{2}-\d{2}$/;
-
-    // If the string is already in the correct format, return it
-    if (dateRegex.test(input)) {
-        return input;
-    }
-
-    // Try to format the string to dd-mm
-    const parts = input.split(/[-\/.]/); // Split on -, /, or .
-    if (parts.length >= 2) {
-        const [day, month] = parts;
-
-        // Ensure day and month are valid numbers
-        if (
-            day.length === 2 &&
-            month.length === 2 &&
-            !isNaN(Number(day)) &&
-            !isNaN(Number(month))
-        ) {
-            return `${day.padStart(2, "0")}-${month.padStart(2, "0")}`;
-        }
-    }
-
-    // If input cannot be formatted, throw an error or return null
-
-    return null;
-}
 
 
 const getTempleData = async (templeId, targetDate = null) => {
@@ -41,15 +10,15 @@ const getTempleData = async (templeId, targetDate = null) => {
         if (targetDate === null) {
             templeData = await TempleDetailsModel.findById(templeId)
                 .populate([
-                    { path: "csvUser" },
-                    { path: "PostDetails" },
+                    { path: "csvData" },
+                    { path: "postDetails" },
                 ]);
         }
         else {
             templeData = await TempleDetailsModel.findById(templeId)
                 .populate([
-                    { path: "csvUser", match: { birthdate: targetDate } }, // Filter csvUser by birthdate
-                    { path: "PostDetails" },
+                    { path: "csvData", match: { date_month: targetDate } }, // Filter csvUser by date_month
+                    { path: "postDetails" },
                 ]);
         }
 
@@ -81,6 +50,8 @@ const createTemple = async (req, res) => {
             postDetails
         } = req.body;
 
+        // Validate required fields
+        const missingFields = [];
         const requiredFields = {
             templeName,
             instagramUrl,
@@ -90,19 +61,16 @@ const createTemple = async (req, res) => {
             phone,
             taxId,
             address,
-            csvData,
-            postDetails
+            postDetails,
         };
 
-        // Check for missing fields
-        const missingFields = [];
-        Object.keys(requiredFields).forEach((key) => {
-            if (requiredFields[key] === undefined || requiredFields[key].length === 0) {
+        Object.entries(requiredFields).forEach(([key, value]) => {
+            if (!value || (typeof value === "string" && value.trim() === "")) {
                 missingFields.push(key);
             }
         });
 
-        // Check for missing files
+        // Validate required files
         const requiredFiles = ["zelleQrCode", "paypalQrCode"];
         requiredFiles.forEach((fileKey) => {
             if (!req.files || !req.files[fileKey]) {
@@ -110,50 +78,50 @@ const createTemple = async (req, res) => {
             }
         });
 
-        if (missingFields.length !== 0) {
+        if(csvData === undefined || csvData.length === 0)
+        {
+            missingFields.push(csvData);
+        }
+
+        if (missingFields.length > 0) {
             return res
                 .status(400)
                 .json({ error: `Missing fields: ${missingFields.join(", ")}` });
         }
 
-        // Add file paths to requiredFields
-        const zelleQrCodeURL = await cloudinary.uploader.upload(req.files.zelleQrCode[0].path);
-        requiredFields.zelleQrCodeURL = zelleQrCodeURL.secure_url
+        // Upload files to Cloudinary
+        const fileUploadPromises = requiredFiles.map((fileKey) =>
+            cloudinary.uploader.upload(req.files[fileKey][0].path)
+        );
 
-        const paypalQrCodeURL = await cloudinary.uploader.upload(req.files.paypalQrCode[0].path);
-        requiredFields.paypalQrCodeURL = paypalQrCodeURL.secure_url
+        const [zelleQrCodeUpload, paypalQrCodeUpload] = await Promise.all(fileUploadPromises);
 
-        requiredFields.campaign = campaign;
-        requiredFields.user = user;
+        // Prepare data for saving
+        const templeData = {
+            ...requiredFields,
+            zelleQrCodeURL: zelleQrCodeUpload.secure_url,
+            paypalQrCodeURL: paypalQrCodeUpload.secure_url,
+            user,
+        };
 
+        templeData.user = user;
 
-        // Process and filter valid data
-        const processedData = csvData
-            .map((user) => {
-                const birthdate = formatDateString(user.birthdate);
-                if (!birthdate) return null; // Skip invalid rows
-                return {
-                    first_name: user.first_name,
-                    last_name: user.last_name,
-                    email: user.email,
-                    contact: user.contact,
-                    birthdate,
-                };
-            })
-            .filter(Boolean); // Remove null entries
-
-
-        const ids = await saveUsers(processedData); // Save users to DB
-        requiredFields.csvUser = ids;
         // Save temple data
-        const templeData = new TempleDetailsModel(requiredFields);
-        await templeData.save();
+        const newTemple = new TempleDetailsModel(templeData);
+        await newTemple.save();
+         
+        newTemple.csvData = await saveUsersWithBirthDay(csvData, newTemple._id);
 
+        await newTemple.save();
+
+        // Send success response
+        res.status(201).json({ message: "Temple created successfully", temple: newTemple });
     } catch (error) {
-        console.log("Error in the createTemple, ", error);
-        res.status(500).send({ error: "Internal server error..." })
+        console.error("Error in createTemple:", error);
+        res.status(500).json({ error: "Internal server error" });
     }
-}
+};
+
 
 const deleteTemple = async (req, res) => {
     try {
@@ -195,7 +163,8 @@ const updateTemple = async (req, res) => {
             phone,
             taxId,
             address,
-            postDetails
+            postDetails,
+            csvData
         };
 
 
@@ -213,23 +182,9 @@ const updateTemple = async (req, res) => {
             const paypalQrCodeURL = await cloudinary.uploader.upload(req.files.paypalQrCode[0].path);
             fieldsToUpdate.paypalQrCodeURL = paypalQrCodeURL.secure_url
         }
-        if (csvData.length !== 0) {
-            const processedData = csvData
-                .map((user) => {
-                    const birthdate = formatDateString(user.birthdate);
-                    if (!birthdate) return null; // Skip invalid rows
-                    return {
-                        first_name: user.first_name,
-                        last_name: user.last_name,
-                        email: user.email,
-                        contact: user.contact,
-                        birthdate,
-                    };
-                })
-                .filter(Boolean); // Remove null entries
-
-            const ids = await saveUsers(processedData); // Save users to DB
-            fieldsToUpdate.csvUser = ids;
+        if (csvData.length > 0) {
+            const ids = await saveUsersWithBirthDay(csvData); // Save users to DB
+            fieldsToUpdate.csvData = ids;
         }
         const updatedPost = await TempleDetailsModel.findByIdAndUpdate(id, fieldsToUpdate, { new: true, runValidators: true });
         res.status(200).send({ updatedPost });

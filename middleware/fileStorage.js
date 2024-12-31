@@ -62,6 +62,7 @@ export const configureFileUpload = (isSingle = false, fieldName = "") => {
       { name: "csvFile", maxCount: 1 },
       { name: "audioFile", maxCount: 1 },
       { name: "videoFile", maxCount: 1 },
+      { name: "media", maxCount: 1}
     ]);
   }
 };

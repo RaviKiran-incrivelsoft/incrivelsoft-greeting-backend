@@ -3,9 +3,6 @@ import nodemailer from "nodemailer";
 const EMAIL = process.env.EMAIL;
 const PASS_KEY = process.env.PASS_KEY;
 const BASE_URL = process.env.BASE_URL;
-const templeImage = `${BASE_URL}/uploads/santaImage.png`;
-const birthdayVideo = `${BASE_URL}/uploads/birthdayVideo.mp4`;
-const birthdayImage = `${BASE_URL}/uploads/birthdayImage.png`;
 
 
 export default async function sendGreetings(template, userDetails) {
@@ -81,13 +78,6 @@ function createEmailContent(template, userDetails) {
                                                     <table border="0" cellspacing="0" cellpadding="0" width="800" align="center">
                                                         <tr>
                                                             <td>
-                                                                <div style="float: left; width: 40%; margin-top: 10px; margin-left: 10px;">
-                                                                    <div style="width: 440px; overflow: hidden; border-radius: 30% 30% 0% 0%;">
-                                                                        <img src="${templeImage}" alt="Hindu Community and Cultural Center" style="width: 100%; height: auto;">
-                                                                    </div>
-                                                                </div>
-                                                            </td>
-                                                            <td>
                                                                 <div style="float: right; width: 80%; margin-right: 20px;">
                                                                     <description>
                                                                         <p style="font-style: normal; font-size: 15px; text-align: justify; font-family: 'Georgia', serif;">${template.templeDescription}</p>
@@ -100,15 +90,7 @@ function createEmailContent(template, userDetails) {
                                                 <div style="text-align: center; background-color: #ed6f0e; padding: 18px; border-radius: 8px; margin: 10px 10px;">
                                                     <p style="font-size: 25px; font-weight: bold; color: #ffffff; font-family: 'Georgia', serif, cursive; margin: 0;">Happy BirthDay</p>
                                                 </div>
-                                                <table cellspacing="0" cellpadding="0">
-                                                    <tr>
-                                                        <td>
-                                                            <div style="margin-top: 1px; margin-right: 10px; margin-left: 10px; position: relative; display: inline-block;">
-                                                                <a href="${birthdayVideo}" style="position: relative;"><img src="${birthdayImage}" alt="Birthday Wishes" style="max-width: 100%; height: auto; border-radius: 10px;"></a>
-                                                            </div>
-                                                        </td>
-                                                    </tr>
-                                                </table>
+                                    
                                                 <div style="text-align: center;">
                                                     <p style="font-family: 'Georgia', serif; text-align: center; font-size: 18px; margin: 0; margin-top: 15px;">Our mission is to make our community a better place. Your support is essential to achieving this goal. Please consider donating today.</p>
                                                     <table cellspacing="0" cellpadding="0" style="margin: 2% auto;">

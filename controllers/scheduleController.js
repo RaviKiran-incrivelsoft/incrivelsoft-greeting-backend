@@ -2,20 +2,28 @@ import { scheduleSchema } from "../models/Schedule.js";
 
 const createSchedule = async (req, res) => {
     try {
-        const { schedule, time, temple, mode } = req.body;
+        const { schedule, time, temple, marriage, festival, event, birthday, mode } = req.body;
+        const fieldsToSave =  { schedule, time, temple, marriage, festival, event, birthday, mode };
+        Object.keys(fieldsToSave).forEach((key) => {
+            if(fieldsToSave[key] === undefined)
+            {
+                delete fieldsToSave[key];
+            }
+        })
         const user = req.user.userId;
-        const requiredFields = { schedule, temple, mode };
-        const missingFields = Object.keys(requiredFields).filter(key => requiredFields[key] === undefined);
+        fieldsToSave.user = user;
+        console.log("fieldsToSave")
 
-        if (missingFields.length > 0) {
-            return res.status(400).send({ error: `${missingFields.join(", ")} are required...` });
-        }
-        if (schedule === "schedule_later" && !time) {
+        if (fieldsToSave.schedule === "schedule_later" && !fieldsToSave.time) {
             return res.status(400).send({ error: "Time is required for 'schedule_later'." });
         }
-        const saveSchedule = new scheduleSchema({ schedule, time, temple, user, mode });
+        if(!fieldsToSave.mode)
+        {
+            return res.status(400).send({error: "Mode is required..."});
+        }
+        const saveSchedule = new scheduleSchema(fieldsToSave);
         await saveSchedule.save();
-        res.status(201).send({ message: 'Schedule created Successfully' })
+        res.status(201).send({ message: 'Schedule created Successfully', saveSchedule })
     } catch (error) {
         console.log("Error in the createSchedule, ", error);
         res.status(500).send({ error: "Internal Server error..." });
@@ -24,17 +32,19 @@ const createSchedule = async (req, res) => {
 
 const updateSchedule = async (req, res) => {
     try {
-        const { schedule, time, mode } = req.body;
-        const { id } = req.params;
-        const fieldsToUpdate = {};
-        if (schedule !== undefined) {
-            fieldsToUpdate.schedule = schedule;
-        }
-        if (time !== undefined) {
-            fieldsToUpdate.time = time;
-        }
-        if (mode !== undefined) {
-            fieldsToUpdate.mode = mode;
+        const { schedule, time, temple, marriage, festival, event, birthday, mode } = req.body;
+        const {id} = req.params;
+        const fieldsToUpdate =  { schedule, time, temple, marriage, festival, event, birthday, mode };
+        Object.keys(fieldsToUpdate).forEach((key) => {
+            if(fieldsToUpdate[key] === undefined)
+            {
+                delete fieldsToUpdate[key];
+            }
+        })
+        
+
+        if (fieldsToUpdate.schedule === "schedule_later" && !fieldsToUpdate.time) {
+            return res.status(400).send({ error: "Time is required for 'schedule_later'." });
         }
         const updateSchedule = await scheduleSchema.findByIdAndUpdate(id, fieldsToUpdate, { new: true, runValidators: true });
         if (!updateSchedule) {
@@ -49,19 +59,47 @@ const updateSchedule = async (req, res) => {
 
 const getSchedules = async (req, res) => {
     try {
-        const { page = 1, limit = 10 } = req.query;
+        // Extract query parameters and convert to numbers
+        const page = parseInt(req.query.page, 10) || 1;
+        const limit = parseInt(req.query.limit, 10) || 10;
         const skip = (page - 1) * limit;
-        const schedules = await scheduleSchema.find({ user: req.user.userId })
+
+        // Ensure the user is authenticated
+        const userId = req.user?.userId;
+        if (!userId) {
+            return res.status(401).send({ error: "Unauthorized access. User ID is required." });
+        }
+
+        // Fetch schedules with pagination
+        const schedules = await scheduleSchema.find({ user: userId })
             .skip(skip)
             .limit(limit)
-            .populate('temple', 'templeName templeTitle address templeDescription websiteUrl');
-        const totalSchedules = await scheduleSchema.countDocuments({ user: req.user.userId });
-        res.status(200).send({ currentPage: page, totalPages: Math.ceil(totalSchedules / limit), schedules });
+            .lean(); // Use .lean() for faster read operations
+
+        // Dynamically populate the non-null fields
+        const fields = ["temple", "birthday", "event", "festival", "marriage"];
+        for (const schedule of schedules) {
+            const fieldToPopulate = fields.find((field) => schedule[field]);
+            if (fieldToPopulate) {
+                await scheduleSchema.populate(schedule, { path: fieldToPopulate });
+            }
+        }
+
+        // Count total schedules
+        const totalSchedules = await scheduleSchema.countDocuments({ user: userId });
+
+        // Respond with paginated data
+        res.status(200).send({
+            currentPage: page,
+            totalPages: Math.ceil(totalSchedules / limit),
+            schedules,
+        });
     } catch (error) {
-        console.log("Error in the getSchedules, ", error);
+        console.error("Error in the getSchedules:", error);
         res.status(500).send({ error: "Internal Server error..." });
     }
-}
+};
+
 
 const deleteSchedule = async (req, res) => {
     try {
@@ -77,13 +115,23 @@ const deleteSchedule = async (req, res) => {
     }
 }
 
-const fetchSchedules = async(schedule) => {
+const fetchSchedules = async (schedule, type) => {
     try {
-        const schedules = await scheduleSchema.find({schedule});
-        return schedules;
+        // Fetch schedules based on the `schedule` parameter
+        const schedules = await scheduleSchema.find({ schedule });
+
+        // Filter schedules that have a truthy value for the specified `type`
+        if (!type) {
+            console.error("Type parameter is missing or invalid.");
+            return [];
+        }
+
+        return schedules.filter((item) => item[type]);
     } catch (error) {
-        console.log("Error in the fetchSchedules....", error);
+        console.error("Error in the fetchSchedules function:", error);
+        return [];
     }
-}
+};
+
 
 export { createSchedule, updateSchedule, getSchedules, deleteSchedule, fetchSchedules };

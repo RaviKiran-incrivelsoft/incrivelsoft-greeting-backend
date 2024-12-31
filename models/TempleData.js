@@ -41,7 +41,7 @@ const dataSchema = new Schema({
         ref: "UserDetails",
         required: true
     },
-    csvUser: {
+    csvData: {
         type: [mongoose.Schema.Types.ObjectId],
         ref: "CSVUsers",
         default: [],
@@ -53,6 +53,6 @@ const dataSchema = new Schema({
 
 }, { timestamps: true });
 
-const TempleDetailsModel = mongoose.model('TempleDetails', dataSchema);
+const TempleDetailsModel = mongoose.model('TempleDetailsGreetings', dataSchema);
 
 export { TempleDetailsModel };
