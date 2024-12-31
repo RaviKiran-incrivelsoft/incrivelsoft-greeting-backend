@@ -9,8 +9,9 @@ const createTemplate = (details) => {
 
     const templateJSON = JSON.stringify({
         banner: `${details.postDetails.mediaURL.replace(/\\/g, '/')}`,
-        details: details.postDetails.postDescription,
-        from: details.from
+        description: details.postDetails.postDescription,
+        from: details.from,
+        title: details.title
     });
     const template = JSON.parse(templateJSON);
     return template;
@@ -52,7 +53,7 @@ const sendScheduledMailsFromBirthDay = async (id) => {
     try {
         const data = await getBirthDayData(id);
         if (data) {
-            const template = await createTempleDetailsTemplate(data);
+            const template = await createTemplate(data);
             for (const user of data.csvData) {
                 await sendGreetings(template, user);
             }

@@ -9,6 +9,7 @@ const BASE_URL = process.env.BASE_URL;
 export default async function sendGreetings(template, userDetails) {
 
     console.log("Sending the birthday email for ", userDetails.email);
+	const age = calculateAge(userDetails.birthdate);
 
     // Nodemailer transporter configured with a Gmail account
     const transporter = nodemailer.createTransport({
@@ -23,8 +24,8 @@ export default async function sendGreetings(template, userDetails) {
     const mailOptions = {
         from: EMAIL,
         to: userDetails.email,
-        subject: "Happy Birthday!",
-        html: createEmailContent(template, userDetails)
+        subject: template.title || "Happy Birthday",
+        html: createEmailContent(template, userDetails, age)
     };
 
     // Sends the email using transporter.sendMail and logs success or error messages
@@ -38,7 +39,7 @@ export default async function sendGreetings(template, userDetails) {
 }
 
 /// Function to generate the HTML content of the email
-function createEmailContent(template, userDetails) {
+function createEmailContent(template, userDetails, age) {
     const html = `
         <!DOCTYPE html>
 <html lang="en">
@@ -47,7 +48,7 @@ function createEmailContent(template, userDetails) {
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>Happy Birthday ${userDetails.first_name} ${userDetails.last_name}</title>
+	<title>Happy Birthday ${userDetails.first_name || "Ravi"} ${userDetails.last_name || "kiran"}</title>
 </head>
 
 <body style="margin: 0; padding: 0; font-family: 'Open Sans', sans-serif;">
@@ -55,7 +56,7 @@ function createEmailContent(template, userDetails) {
 		<!-- Header -->
 		<tr>
 			<td style="background-color: #bb395e; color: #ffffff; text-align: center; padding: 30px;">
-				<h1 style="margin: 0; font-size: 36px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);">Happy ${calculateAge(userDetails.birthday)}th Birthday, ${userDetails.first_name} ${userDetails.last_name}!</h1>
+				<h1 style="margin: 0; font-size: 36px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);">Happy ${ age || "18"}th Birthday, ${userDetails.first_name || "Ravi"} ${userDetails.last_name || "Kiran"}!</h1>
 				<p style="margin: 5px 0 0; font-size: 20px; font-weight: 300; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);">Wishing you a day filled with love and joy!</p>
 			</td>
 		</tr>
@@ -69,9 +70,10 @@ function createEmailContent(template, userDetails) {
 		<tr>
 			<td style="padding: 20px; text-align: center; color: #bb395e;">
 				<h2 style="margin: 10px 0; font-size: 24px; font-weight: 400;">Enjoy Your Special Day!</h2>
-				<p style="font-size: 16px; line-height: 1.5; margin: 10px 0 20px;">We’re thrilled to celebrate your ${calculateAge(userDetails.birthday)}th birthday with you. As a token of our appreciation, here’s a little surprise to make your day even more memorable. Have a fantastic birthday, ${userDetails.first_name} ${userDetails.last_name}!</p>
+				<p style="font-size: 16px; line-height: 1.5; margin: 10px 0 20px;">We’re thrilled to celebrate your ${ age || "18" }th birthday with you. As a token of our appreciation, here’s a little surprise to make your day even more memorable. Have a fantastic birthday, ${userDetails.first_name} ${userDetails.last_name}!</p>
+				<p style="font-size: 16px; line-height: 1.5; margin: 10px 0 20px;">${template?.description || ""} </p>
                 <p style="font-size: 16px; line-height: 1.5; margin: 10px 0 20px;">Warm wishes, </p>
-                <p style="font-size: 16px; line-height: 1.5; margin: 10px 0 20px;">${template.from}</p>
+                <p style="font-size: 16px; line-height: 1.5; margin: 10px 0 20px;">${template.from || "Incrivelsoft Team"}</p>
 			</td>
 		</tr>
 		<!-- Footer -->

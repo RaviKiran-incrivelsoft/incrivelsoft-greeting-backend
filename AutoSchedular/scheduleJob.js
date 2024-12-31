@@ -2,6 +2,7 @@ import schedule from 'node-schedule';
 import { scheduleSchema } from '../models/Schedule.js';
 import { sendScheduledMailsFromTemple, sendAutoMailsFromTemple } from "../utils/templeUtils.js";
 import { sendScheduledMailsFromFestival } from "../utils/festivalUtils.js"
+import {sendScheduledMailsFromBirthDay, sendAutoMailsFromBirthDay} from "../utils/birthDayUtils.js"
 
 
 const scheduleJobs = (job) => {
@@ -63,13 +64,13 @@ const handleJobExecution = async (job) => {
                 break;
             case "birthday":
                 if (job.mode === "email") {
-                    await sendScheduledMailsFromTemple(job.temple);
+                    await sendScheduledMailsFromBirthDay(job.birthday);
                 }
                 else if (job.mode === "whatsapp") {
                     console.log("Whatsapp not yet implemented...");
                 }
                 else {
-                    await sendScheduledMailsFromTemple(job.temple);
+                    await sendScheduledMailsFromBirthDay(job.birthday);
                     console.log("Whatsapp not yet implemented...");
                 }
                 break;
@@ -162,5 +163,6 @@ export const watchSchedules = async () => {
 schedule.scheduleJob('26 09 * * *', async () => {
     console.log('Scheduled job triggered at:', new Date());
     sendAutoMailsFromTemple();
+    sendAutoMailsFromBirthDay();
 
 });
