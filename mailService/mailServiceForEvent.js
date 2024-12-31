@@ -5,38 +5,64 @@ const PASS_KEY = process.env.PASS_KEY;
 
 export default async function sendGreetings(template, userDetails) {
 
-    console.log("Sending the event email for ", userDetails.email);
+  console.log("Sending the event email for ", userDetails.email);
 
-    // Nodemailer transporter configured with a Gmail account
-    const transporter = nodemailer.createTransport({
-        host: "smtp.gmail.com",
-        auth: {
-            user: EMAIL,
-            pass: PASS_KEY
-        }
-    });
+  function getMonthAndDay(dateString) {
+    // Default date string
+    const dateInput = dateString || "31-12-2024";
 
-    // Constructs an email object with the following details
-    const mailOptions = {
-        from: EMAIL,
-        to: userDetails.email,
-        subject: template.title,
-        html: createEmailContent(template, userDetails)
+    // Parse the date string in 'DD-MM-YYYY' format
+    const [day, month, year] = dateInput.split("-").map(Number);
+
+    // Validate the date parts
+    if (!day || !month || !year || day > 31 || month > 12) {
+      return { day: null, monthName: null };
+    }
+
+    // Create a date object
+    const date = new Date(year, month - 1, day);
+
+    // Get the month name and day
+    const monthName = date.toLocaleString("default", { month: "long" });
+
+    return {
+      day,
+      monthName,
     };
+  }
 
-    // Sends the email using transporter.sendMail and logs success or error messages
-    transporter.sendMail(mailOptions, (error, info) => {
-        if (error) {
-            console.log(error);
-        } else {
-            console.log("Email sent: " + info.response);
-        }
-    });
+  const { day, monthName } = getMonthAndDay(template.date);
+
+  // Nodemailer transporter configured with a Gmail account
+  const transporter = nodemailer.createTransport({
+    host: "smtp.gmail.com",
+    auth: {
+      user: EMAIL,
+      pass: PASS_KEY
+    }
+  });
+
+  // Constructs an email object with the following details
+  const mailOptions = {
+    from: EMAIL,
+    to: userDetails.email,
+    subject: template.title,
+    html: createEmailContent(template, userDetails)
+  };
+
+  // Sends the email using transporter.sendMail and logs success or error messages
+  transporter.sendMail(mailOptions, (error, info) => {
+    if (error) {
+      console.log(error);
+    } else {
+      console.log("Email sent: " + info.response);
+    }
+  });
 }
 
 /// Function to generate the HTML content of the email
 function createEmailContent(template, userDetails) {
-    const html = `
+  const html = `
         <!DOCTYPE html>
 <html lang="en">
 
@@ -70,8 +96,9 @@ function createEmailContent(template, userDetails) {
 
     <!-- Date and Time -->
     <div style="text-align: center; margin: 20px 0; display: flex; justify-content: center; align-items: center; font-size: 18px;">
+      <div style="color: #b49d80; font-weight: bold; margin: 0 10px;">${monthName}</div>
       <div style="width: 2px; height: 60px; background-color: #b49d80;"></div>
-      <div style="font-size: 48px; font-weight: bold; margin: 0 10px; color: #333333;">${template.date || "31-12-2024"}</div>
+      <div style="font-size: 48px; font-weight: bold; margin: 0 10px; color: #333333;">${day}</div>
       <div style="width: 2px; height: 60px; background-color: #b49d80;"></div>
       <div style="color: #b49d80; font-weight: bold; margin: 0 10px;">5 PM</div>
     </div>
@@ -94,6 +121,6 @@ function createEmailContent(template, userDetails) {
 </html>
 `;
 
-    return html;
+  return html;
 }
 
