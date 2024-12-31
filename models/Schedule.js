@@ -6,7 +6,7 @@ const dataSchema = Schema({
     schedule: {
         type: String,
         enum: ["schedule_now", "schedule_later", "pause", "completed", "automate"],
-        default: "schedule"
+        default: "pause"
     },
     time: {
         type: Date,

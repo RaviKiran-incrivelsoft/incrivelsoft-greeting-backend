@@ -3,6 +3,8 @@ import { scheduleSchema } from '../models/Schedule.js';
 import { sendScheduledMailsFromTemple, sendAutoMailsFromTemple } from "../utils/templeUtils.js";
 import { sendScheduledMailsFromFestival } from "../utils/festivalUtils.js"
 import {sendScheduledMailsFromBirthDay, sendAutoMailsFromBirthDay} from "../utils/birthDayUtils.js"
+import {sendScheduledMailsFromMarriageDay, sendAutoMailsFromMarriage} from "../utils/marriageUtils.js"
+import {sendScheduledMailsFromEvent} from "../utils/eventUtils.js"
 
 
 const scheduleJobs = (job) => {
@@ -76,13 +78,13 @@ const handleJobExecution = async (job) => {
                 break;
             case "event":
                 if (job.mode === "email") {
-                    await sendScheduledMailsFromTemple(job.temple);
+                    await sendScheduledMailsFromEvent(job.event);
                 }
                 else if (job.mode === "whatsapp") {
                     console.log("Whatsapp not yet implemented...");
                 }
                 else {
-                    await sendScheduledMailsFromTemple(job.temple);
+                    await sendScheduledMailsFromEvent(job.event);
                     console.log("Whatsapp not yet implemented...");
                 }
                 break;
@@ -100,13 +102,13 @@ const handleJobExecution = async (job) => {
                 break;
             case "marriage":
                 if (job.mode === "email") {
-                    await sendScheduledMailsFromTemple(job.temple);
+                    await sendScheduledMailsFromMarriageDay(job.marriage);
                 }
                 else if (job.mode === "whatsapp") {
                     console.log("Whatsapp not yet implemented...");
                 }
                 else {
-                    await sendScheduledMailsFromTemple(job.temple);
+                    await sendScheduledMailsFromMarriageDay(job.marriage);
                     console.log("Whatsapp not yet implemented...");
                 }
                 break;
@@ -160,9 +162,9 @@ export const watchSchedules = async () => {
 };
 
 
-schedule.scheduleJob('26 09 * * *', async () => {
+schedule.scheduleJob('16 16 * * *', async () => {
     console.log('Scheduled job triggered at:', new Date());
     sendAutoMailsFromTemple();
     sendAutoMailsFromBirthDay();
-
+    sendAutoMailsFromMarriage();
 });
