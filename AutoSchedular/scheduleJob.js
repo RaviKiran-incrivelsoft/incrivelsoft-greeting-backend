@@ -1,7 +1,7 @@
 import schedule from 'node-schedule';
 import { scheduleSchema } from '../models/Schedule.js';
 import { sendScheduledMailsFromTemple, sendAutoMailsFromTemple } from "../utils/templeUtils.js";
-import { sendScheduledMailsFromFestival } from "../utils/festivalUtils.js"
+import { sendScheduledMailsFromFestival, sendScheduledMsgFromFestival } from "../utils/festivalUtils.js"
 import {sendScheduledMailsFromBirthDay, sendAutoMailsFromBirthDay} from "../utils/birthDayUtils.js"
 import {sendScheduledMailsFromMarriageDay, sendAutoMailsFromMarriage} from "../utils/marriageUtils.js"
 import {sendScheduledMailsFromEvent} from "../utils/eventUtils.js"
@@ -93,11 +93,11 @@ const handleJobExecution = async (job) => {
                     await sendScheduledMailsFromFestival(job.festival);
                 }
                 else if (job.mode === "whatsapp") {
-                    console.log("Whatsapp not yet implemented...");
+                    sendScheduledMsgFromFestival(job.festival);
                 }
                 else {
                     sendScheduledMailsFromFestival(job.festival);
-                    console.log("Whatsapp not yet implemented...");
+                    sendScheduledMsgFromFestival(job.festival);
                 }
                 break;
             case "marriage":

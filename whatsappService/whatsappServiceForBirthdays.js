@@ -4,6 +4,11 @@ const API_KEY = process.env.AISENSY_API_KEY;
 const WHATSAPP_API = process.env.WHATSAPP_API;
 
 const sendWhatsappMessage = async (to, mediaUrl, templateParams, templeId) => {
+    if (!to || !mediaUrl || !templateParams || !templeId) {
+        console.error("Invalid input data for WhatsApp message:", { to, mediaUrl, templateParams, templeId });
+        return;
+    }
+
     try {
         const data = {
             apiKey: API_KEY,
@@ -14,13 +19,7 @@ const sendWhatsappMessage = async (to, mediaUrl, templateParams, templeId) => {
             source: 'new-landing-page form',
             media: {
                 url: mediaUrl,
-                filename: 'sample_media'
-            },
-            buttons: [],
-            carouselCards: [],
-            location: {},
-            paramsFallbackValue: {
-                FirstName: 'user'
+                filename: mediaUrl.split('/').pop() || 'default_media'
             }
         };
 
@@ -29,11 +28,14 @@ const sendWhatsappMessage = async (to, mediaUrl, templateParams, templeId) => {
                 'Content-Type': 'application/json'
             }
         };
+
         const response = await axios.post(`${WHATSAPP_API}`, data, configAxios);
         console.log('Message sent successfully:', response.data);
     } catch (error) {
-        console.log("Error in the sendWhatsappMessage, ", error);
+        console.error(`Error in sendWhatsappMessage: ${error.message}`, {
+            errorDetails: error.response?.data || error.stack
+        });
     }
-}
+};
 
 export default sendWhatsappMessage;

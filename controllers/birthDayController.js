@@ -155,4 +155,19 @@ const deleteBirthDayDetails = async(req, res) => {
     }
 }
 
-export {createBirthDayDetails, getAllBirthDayDetails, getBirthDayDetails, updateBirthDayDetails, deleteBirthDayDetails, getBirthDayData};
+const updateResponse = async(id, data) => {
+    try {
+        const updateResponse = await BirthDayModel.findById(id);
+        if(!updateResponse)
+        {
+            throw new Error(`birthday Details is exists with id: ${id}`);
+        }
+        updateResponse.response.push(...data);
+        await updateResponse.save();
+        console.log(updateResponse);
+    } catch (error) {
+        console.log("Error in the updateReponse, ", error);
+    }
+}
+
+export {createBirthDayDetails, getAllBirthDayDetails, getBirthDayDetails, updateBirthDayDetails, deleteBirthDayDetails, getBirthDayData, updateResponse};

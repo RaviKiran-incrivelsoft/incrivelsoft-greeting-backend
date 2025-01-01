@@ -227,4 +227,20 @@ const getAllTemples = async (req, res) => {
     }
 }
 
-export { getTempleData, createTemple, getAllTemples, getTemple, deleteTemple, updateTemple };
+const updateResponse = async(id, data) => {
+    try {
+        const updateResponse = await TempleDetailsModel.findById(id);
+        if(!updateResponse)
+        {
+            throw new Error(`birthday Details is exists with id: ${id}`);
+        }
+        updateResponse.response.push(...data);
+        await updateResponse.save();
+        console.log(updateResponse);
+    } catch (error) {
+        console.log("Error in the updateReponse, ", error);
+    }
+}
+
+
+export { getTempleData, createTemple, getAllTemples, getTemple, deleteTemple, updateTemple, updateResponse };

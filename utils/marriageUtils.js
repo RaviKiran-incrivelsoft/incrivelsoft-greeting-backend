@@ -1,7 +1,9 @@
 import { fetchSchedules } from "../controllers/scheduleController.js";
-import { getMarriageData } from "../controllers/marriageController.js";
-import sendGreetings from "../mailService/mailServiceForMarriage.js"
-import getTodayDate from "./getTodayDate.js"
+import { saveResponse } from "../controllers/mailResponseController.js";
+import { getMarriageData, updateResponse } from "../controllers/marriageController.js";
+import sendGreetings from "../mailService/mailServiceForMarriage.js";
+import getTodayDate from "./getTodayDate.js";
+import delay from 'delay';
 
 const todayDate = getTodayDate();
 
@@ -54,9 +56,16 @@ const sendScheduledMailsFromMarriageDay = async (id) => {
         const data = await getMarriageData(id);
         if (data) {
             const template = await createTemplate(data);
+            console.log("Marriage data: ", data);
+            const responseArray = [];
             for (const user of data.csvData) {
-                await sendGreetings(template, user);
+                const response = await sendGreetings(template, user);
+                response.ref = id;
+                responseArray.push(response);
+                await delay(1000);
             }
+            const ids = await saveResponse(responseArray);
+            await updateResponse(id, ids);
         }
         else {
             console.log(`No Marriage details found with Id: ${id}`)

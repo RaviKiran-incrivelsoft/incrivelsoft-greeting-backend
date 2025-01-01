@@ -27,13 +27,14 @@ export default async function sendGreetings(template, userDetails) {
     };
 
     // Sends the email using transporter.sendMail and logs success or error messages
-    transporter.sendMail(mailOptions, (error, info) => {
-        if (error) {
-            console.log(error);
-        } else {
-            console.log("Email sent: " + info.response);
-        }
-    });
+    try {
+		const info = await transporter.sendMail(mailOptions);
+		console.log("Email sent: ", info.response);
+		return { success: true, email: userDetails.email };
+	} catch (error) {
+		console.log(error);
+		return { success: false, email: userDetails.email };
+	}
 }
 
 /// Function to generate the HTML content of the email

@@ -143,4 +143,20 @@ const deleteEventDetails = async(req, res) => {
     }
 }
 
-export {createEvent, getAllEventDetails, getEventDetails, updateEventDetails, deleteEventDetails, getEventData};
+const updateResponse = async(id, data) => {
+    try {
+        const updateResponse = await EventSchema.findById(id);
+        if(!updateResponse)
+        {
+            throw new Error(`birthday Details is exists with id: ${id}`);
+        }
+        updateResponse.response.push(...data);
+        await updateResponse.save();
+        console.log(updateResponse);
+    } catch (error) {
+        console.log("Error in the updateReponse, ", error);
+    }
+}
+
+
+export {createEvent, getAllEventDetails, getEventDetails, updateEventDetails, deleteEventDetails, getEventData, updateResponse};

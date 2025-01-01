@@ -1,5 +1,7 @@
-import { getEventData } from "../controllers/eventController.js";
-import sendGreetings from "../mailService/mailServiceForEvent.js"
+import { getEventData, updateResponse } from "../controllers/eventController.js";
+import sendGreetings from "../mailService/mailServiceForEvent.js";
+import { saveResponse } from "../controllers/mailResponseController.js";
+import delay from 'delay';
 
 const createTemplate = (details) => {
 
@@ -12,7 +14,7 @@ const createTemplate = (details) => {
     });
     const template = JSON.parse(templateJSON);
     return template;
-    
+
 }
 
 
@@ -21,9 +23,15 @@ const sendScheduledMailsFromEvent = async (id) => {
         const data = await getEventData(id);
         if (data) {
             const template = await createTemplate(data);
+            const responseArray = [];
             for (const user of data.csvData) {
-                await sendGreetings(template, user);
+                const response = await sendGreetings(template, user);
+                response.ref = id;
+                responseArray.push(response);
+                await delay(1000);
             }
+            const ids = await saveResponse(responseArray);
+            await updateResponse(id, ids);
         }
         else {
             console.log(`No Festival details found with Id: ${id}`)
@@ -34,4 +42,4 @@ const sendScheduledMailsFromEvent = async (id) => {
     }
 }
 
-export {sendScheduledMailsFromEvent};
+export { sendScheduledMailsFromEvent };

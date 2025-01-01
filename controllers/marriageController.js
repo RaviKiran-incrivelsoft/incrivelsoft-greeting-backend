@@ -135,4 +135,20 @@ const deleteMarriageDetails = async (req, res) => {
     }
 }
 
-export { createMarriageDetails, getAllMarriageDetails, getMarriageDetails, updateMarriageDetails, deleteMarriageDetails, getMarriageData };
+const updateResponse = async(id, data) => {
+    try {
+        const updateResponse = await MarriageModel.findById(id);
+        if(!updateResponse)
+        {
+            throw new Error(`birthday Details is exists with id: ${id}`);
+        }
+        updateResponse.response.push(...data);
+        await updateResponse.save();
+        console.log(updateResponse);
+    } catch (error) {
+        console.log("Error in the updateReponse, ", error);
+    }
+}
+
+
+export { createMarriageDetails, getAllMarriageDetails, getMarriageDetails, updateMarriageDetails, deleteMarriageDetails, getMarriageData, updateResponse };

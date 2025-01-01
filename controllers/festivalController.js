@@ -138,4 +138,20 @@ const deleteFestivalDetils = async (req, res) => {
     }
 }
 
-export { createFestival, getFestival, getAllFestivalDetails, updateFestivalDetails, deleteFestivalDetils, getFestivalData    };
+const updateResponse = async(id, data) => {
+    try {
+        const updateResponse = await FestivalSchema.findById(id);
+        if(!updateResponse)
+        {
+            throw new Error(`birthday Details is exists with id: ${id}`);
+        }
+        updateResponse.response.push(...data);
+        await updateResponse.save();
+        console.log(updateResponse);
+    } catch (error) {
+        console.log("Error in the updateReponse, ", error);
+    }
+}
+
+
+export { createFestival, getFestival, getAllFestivalDetails, updateFestivalDetails, deleteFestivalDetils, getFestivalData, updateResponse  };

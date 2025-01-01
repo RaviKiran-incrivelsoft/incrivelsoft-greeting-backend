@@ -19,7 +19,12 @@ const dataSchema = new Schema({
     postDetails: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "PostDetails"
-    }
+    },
+    response: {
+        type: [mongoose.Schema.Types.ObjectId],
+        ref: "mailresponse",
+        default: [],
+    },
 }, { timestamps: true });
 
 const MarriageModel = mongoose.model('MarriagesGreetings', dataSchema);

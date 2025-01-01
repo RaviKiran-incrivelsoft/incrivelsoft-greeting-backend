@@ -1,9 +1,30 @@
 export default function calculateAge(birthdate) {
-    // Split the dd-mm-yyyy format into day, month, and year
-    const [day, month, year] = birthdate.split('-').map(Number);
+    // Function to parse different date formats
+    const parseDate = (dateStr) => {
+        // Check if the format is 'YYYY-mm-dd'
+        if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+            const [year, month, day] = dateStr.split('-').map(Number);
+            return new Date(year, month - 1, day);
+        }
 
-    // Create a Date object for the birthdate
-    const birthDate = new Date(year, month - 1, day);
+        // Check if the format is 'dd-mm-yyyy'
+        if (/^\d{2}-\d{2}-\d{4}$/.test(dateStr)) {
+            const [day, month, year] = dateStr.split('-').map(Number);
+            return new Date(year, month - 1, day);
+        }
+
+        // Check if the format is 'mm/dd/yyyy'
+        if (/^\d{2}\/\d{2}\/\d{4}$/.test(dateStr)) {
+            const [month, day, year] = dateStr.split('/').map(Number);
+            return new Date(year, month - 1, day);
+        }
+
+        // Throw an error for unsupported formats
+        throw new Error("Unsupported date format. Please use 'YYYY-mm-dd', 'dd-mm-yyyy', or 'mm/dd/yyyy'.");
+    };
+
+    // Parse the birthdate
+    const birthDate = parseDate(birthdate);
 
     // Get the current date
     const currentDate = new Date();

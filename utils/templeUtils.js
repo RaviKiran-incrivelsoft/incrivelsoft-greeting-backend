@@ -1,6 +1,8 @@
 import { fetchSchedules } from "../controllers/scheduleController.js";
-import { getTempleData } from "../controllers/templeController.js";
-import sendGreetings from "../mailService/mailServiceForTempleBirthdays.js"
+import { getTempleData, updateResponse } from "../controllers/templeController.js";
+import { saveResponse } from "../controllers/mailResponseController.js";
+import sendGreetings from "../mailService/mailServiceForTempleBirthdays.js";
+import delay from 'delay';
 
 
 const getTodayDate = () => {
@@ -12,7 +14,7 @@ const getTodayDate = () => {
 
 const todayDate = getTodayDate();
 
-const createTempleDetailsTemplate = (templeDetails) => {
+const createTemplate = (templeDetails) => {
 
     const templateJSON = JSON.stringify({
         templeBanner: `${templeDetails.postDetails.mediaURL.replace(/\\/g, '/')}`,
@@ -63,15 +65,21 @@ const sendAutoMailsFromTemple = async () => {
     }
 }
 
-const sendScheduledMailsFromTemple = async (temple) => {
+const sendScheduledMailsFromTemple = async (id) => {
     try {
-        const templeData = await getTempleData(temple);
-        console.log("temple data: ", templeData);
-        if (templeData) {
-            const template = await createTempleDetailsTemplate(templeData);
-            for (const user of templeData.csvData) {
-                await sendGreetings(template, user);
+        const data = await getTempleData(id);
+        console.log("temple data: ", data);
+        if (data) {
+            const template = await createTemplate(data);
+            const responseArray = [];
+            for (const user of data.csvData) {
+                const response = await sendGreetings(template, user);
+                response.ref = id;
+                responseArray.push(response);
+                await delay(1000);
             }
+            const ids = await saveResponse(responseArray);
+            await updateResponse(id, ids);
         }
         else {
             console.log(`No Templa details found with Id: ${temple}`)

@@ -5,38 +5,39 @@ const PASS_KEY = process.env.PASS_KEY;
 
 export default async function sendGreetings(template, userDetails) {
 
-    console.log("Sending the birthday email for ", userDetails.email);
+	console.log("Sending the birthday email for ", userDetails.email);
 
-    // Nodemailer transporter configured with a Gmail account
-    const transporter = nodemailer.createTransport({
-        host: "smtp.gmail.com",
-        auth: {
-            user: EMAIL,
-            pass: PASS_KEY
-        }
-    });
+	// Nodemailer transporter configured with a Gmail account
+	const transporter = nodemailer.createTransport({
+		host: "smtp.gmail.com",
+		auth: {
+			user: EMAIL,
+			pass: PASS_KEY
+		}
+	});
 
-    // Constructs an email object with the following details
-    const mailOptions = {
-        from: EMAIL,
-        to: userDetails.email,
-        subject: template.title,
-        html: createEmailContent(template, userDetails)
-    };
+	// Constructs an email object with the following details
+	const mailOptions = {
+		from: EMAIL,
+		to: userDetails.email,
+		subject: template.title,
+		html: createEmailContent(template, userDetails)
+	};
 
-    // Sends the email using transporter.sendMail and logs success or error messages
-    transporter.sendMail(mailOptions, (error, info) => {
-        if (error) {
-            console.log(error);
-        } else {
-            console.log("Email sent: " + info.response);
-        }
-    });
+	// Sends the email using transporter.sendMail and logs success or error messages
+	try {
+		const info = await transporter.sendMail(mailOptions);
+		console.log("Email sent: ", info.response);
+		return { success: true, email: userDetails.email };
+	} catch (error) {
+		console.log(error);
+		return { success: false, email: userDetails.email };
+	}
 }
 
 /// Function to generate the HTML content of the email
 function createEmailContent(template, userDetails) {
-    const html = `
+	const html = `
         <!DOCTYPE html>
 <html lang="en">
 
@@ -97,6 +98,6 @@ function createEmailContent(template, userDetails) {
 
 `;
 
-    return html;
+	return html;
 }
 

@@ -1,7 +1,9 @@
 import { fetchSchedules } from "../controllers/scheduleController.js";
-import { getBirthDayData } from "../controllers/birthDayController.js";
-import sendGreetings from "../mailService/mailServiceForBirthDay.js"
-import getTodayDate from "./getTodayDate.js"
+import { getBirthDayData, updateResponse } from "../controllers/birthDayController.js";
+import { saveResponse } from "../controllers/mailResponseController.js";
+import sendGreetings from "../mailService/mailServiceForBirthDay.js";
+import getTodayDate from "./getTodayDate.js";
+import delay from 'delay';
 
 const todayDate = getTodayDate();
 
@@ -54,9 +56,16 @@ const sendScheduledMailsFromBirthDay = async (id) => {
         const data = await getBirthDayData(id);
         if (data) {
             const template = await createTemplate(data);
+            const responseArray = [];
             for (const user of data.csvData) {
-                await sendGreetings(template, user);
+                const response = await sendGreetings(template, user);
+                response.ref = id;
+                responseArray.push(response);
+                await delay(1000);
             }
+            const ids = await saveResponse(responseArray);
+            await updateResponse(id, ids);
+
         }
         else {
             console.log(`No BirthDay details found with Id: ${id}`)
