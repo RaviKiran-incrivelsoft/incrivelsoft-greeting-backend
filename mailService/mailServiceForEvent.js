@@ -71,8 +71,9 @@ function createEmailContent(template, userDetails) {
 
     <!-- Date and Time -->
     <div style="text-align: center; margin: 20px 0; display: flex; justify-content: center; align-items: center; font-size: 18px;">
+      <div style="color: #b49d80; font-weight: bold; margin: 0 10px;">${monthName}</div>
       <div style="width: 2px; height: 60px; background-color: #b49d80;"></div>
-      <div style="font-size: 48px; font-weight: bold; margin: 0 10px; color: #333333;">${template.date || "31-12-2024"}</div>
+      <div style="font-size: 48px; font-weight: bold; margin: 0 10px; color: #333333;">${day}</div>
       <div style="width: 2px; height: 60px; background-color: #b49d80;"></div>
       <div style="color: #b49d80; font-weight: bold; margin: 0 10px;">5 PM</div>
     </div>
