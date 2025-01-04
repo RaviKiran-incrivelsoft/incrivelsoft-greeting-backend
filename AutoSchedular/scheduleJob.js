@@ -145,7 +145,7 @@ export const watchSchedules = async () => {
                 const updatedJob = await scheduleSchema.findById(updatedJobId);
                 if (updatedJob && updatedJob.schedule !== "completed") {
                     if (updatedJob.schedule === 'pause') {
-                        const existingJob = schedule.scheduledJobs[updatedJob_id.toString()];
+                        const existingJob = schedule.scheduledJobs[updatedJob._id.toString()];
                         if (existingJob) {
                             console.log(`Pausing job with ID: ${updatedJobId}`);
                             existingJob.cancel();
