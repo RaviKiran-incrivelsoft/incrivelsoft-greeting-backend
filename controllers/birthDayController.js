@@ -127,7 +127,7 @@ const updateBirthDayDetails = async(req, res) => {
                 delete fieldsToUpdate[key]
             }
         });
-        if(csvData && csvData.length !== 0)
+        if(csvData && csvData.length > 0)
         {
             const birthdateDetails = await BirthDayModel.findById(id);
             fieldsToUpdate.csvData = await saveUsersWithBirthDay(fieldsToUpdate, birthdateDetails._id);

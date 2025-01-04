@@ -1,27 +1,17 @@
-import nodemailer from "nodemailer";
-import calculateAge from "../utils/ageCalculator.js"
+import calculateAge from "../utils/ageCalculator.js";
+import {transporter} from "../utils/transporterUtil.js";
 
 const EMAIL = process.env.EMAIL;
-const PASS_KEY = process.env.PASS_KEY;
 
 export default async function sendGreetings(template, userDetails) {
 
     console.log("Sending the marriage email for ", userDetails.email);
 
-    const age = calculateAge(userDetails.marriagedate)
-
-    // Nodemailer transporter configured with a Gmail account
-    const transporter = nodemailer.createTransport({
-        host: "smtp.gmail.com",
-        auth: {
-            user: EMAIL,
-            pass: PASS_KEY
-        }
-    });
-
+    const age = calculateAge(userDetails.marriagedate);
+	
     // Constructs an email object with the following details
     const mailOptions = {
-        from: EMAIL,
+        from: `Incrivelsoft Team ${EMAIL}`,
         to: userDetails.email,
         subject: template.title || "Happy Anniversary",
         html: createEmailContent(template, userDetails, age)

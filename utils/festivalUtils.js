@@ -21,14 +21,8 @@ const createTemplate = (details) => {
 const createTemplateParams = (details, userDetails) => [
     String(userDetails?.first_name || ''),
     String(userDetails?.last_name || ''),
-    String(details?.festivalName || 'SIYA RAM'),
-    String(details?.address || '123-mnty'),
-    String(details?.phone || '9876543210'),
-    String(details?.websiteUrl || 'https://incrivelsoft.com'),
-    String(details?.facebookUrl || 'https://facebook.com'),
-    String(details?.twitterUrl || 'https://x.com'),
-    String(details?.instagramUrl || 'https://instagram.com'),
-    String(details?.postDetails?.mediaURL || '')
+    String(details?.address || 'SIYA RAM'),
+    String(details?.from || '123-mnty'),
 ];
 
 
@@ -66,13 +60,18 @@ const sendScheduledMsgFromFestival = async (id) => {
         }
 
         const { postDetails: { mediaURL }, csvData } = data;
-        const campaignName = mediaURL.includes('.mp4') ? 'videoga' : 'imagega';
 
+        const responseArray = [];
         for (const user of csvData) {
             const template = createTemplateParams(data, user);
             console.log("Sending Festival message to", user.contact);
-            await sendWhatsappMessage(user.contact, mediaURL, template, campaignName);
+            const response = await sendWhatsappMessage(user.contact, mediaURL, template, "Pongal Greetings");
+            response.ref = id;
+            responseArray.push(response);
+            await delay(1000);
         }
+        const ids = await saveResponse(responseArray);
+        await updateResponse(id, ids);
     } catch (error) {
         console.error("Error in sendScheduledMsgFromFestival:", error);
     }

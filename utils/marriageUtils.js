@@ -35,10 +35,16 @@ const sendAutoMailsFromMarriage = async () => {
                     console.log(`No users are found with marriage match with today associated marriageDetails schema Id:${data._id} `);
                 }
                 else {
+                    const responseArray = [];
                     for (const user of data.csvData) {
                         console.log(`found user with  marriageDay, today, ${user.email} `);
-                        await sendGreetings(template, user);
+                        const response = await sendGreetings(template, user);
+                        response.ref = id;
+                        responseArray.push(response);
+                        await delay(1000);
                     }
+                    const ids = await saveResponse(responseArray);
+                    await updateResponse(id, ids);
                 }
             }
             else {
@@ -76,4 +82,4 @@ const sendScheduledMailsFromMarriageDay = async (id) => {
     }
 }
 
-export {sendScheduledMailsFromMarriageDay, sendAutoMailsFromMarriage};
+export { sendScheduledMailsFromMarriageDay, sendAutoMailsFromMarriage };

@@ -1,24 +1,14 @@
-import nodemailer from "nodemailer";
+import {transporter} from "../utils/transporterUtil.js";
 
 const EMAIL = process.env.EMAIL;
-const PASS_KEY = process.env.PASS_KEY;
 
 export default async function sendGreetings(template, userDetails) {
 
 	console.log("Sending the birthday email for ", userDetails.email);
 
-	// Nodemailer transporter configured with a Gmail account
-	const transporter = nodemailer.createTransport({
-		host: "smtp.gmail.com",
-		auth: {
-			user: EMAIL,
-			pass: PASS_KEY
-		}
-	});
-
 	// Constructs an email object with the following details
 	const mailOptions = {
-		from: EMAIL,
+		from: `Incrivelsoft Team ${EMAIL}`,
 		to: userDetails.email,
 		subject: template.title,
 		html: createEmailContent(template, userDetails)

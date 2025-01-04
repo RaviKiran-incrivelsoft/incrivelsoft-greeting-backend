@@ -68,6 +68,15 @@ const saveUsers = async (data, ref) => {
     }
 };
 
+const deleteUsers = async(ids) => {
+    try {
+        const deletedUsers = await CSVUsers.deleteMany(ids);
+        console.log("delete users, ",  deleteUsers);
+    } catch (error) {
+        console.log("Error in the deleteUsers, ", error);
+    }
+} 
 
 
-export {saveUsersWithBirthDay, saveUsers};
+
+export {saveUsersWithBirthDay, saveUsers, deleteUsers};

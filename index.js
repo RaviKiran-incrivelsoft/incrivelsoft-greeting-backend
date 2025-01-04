@@ -13,6 +13,7 @@ import marriageRouter from "./routes/marriageRoute.js"
 import { templeRouter } from "./routes/templeRoutes.js";
 import { scheduleRouter } from "./routes/scheduleRoutes.js";
 import { watchSchedules } from "./AutoSchedular/scheduleJob.js";
+import responseRouter from "./routes/responseRoutes.js";
 import createPredefinedTemplates from "./utils/createPredefinedTemplates.js";
 
 dotenv.config();
@@ -23,7 +24,17 @@ const app = express();
 app.use(cors());
 
 // Middleware to parse JSON request bodies
-app.use(express.json());
+app.use(express.json({ limit: '6mb' }));
+
+// Middleware to catch and handle errors caused by payloads exceeding the limit
+app.use((err, req, res, next) => {
+  if (err instanceof SyntaxError && err.status === 413) {
+    res.status(413).send({ error: 'Payload too large!' });
+  } else {
+    next(err);
+  }
+});
+
 
 // Middleware to serve static files from the 'uploads' directory
 app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
@@ -51,7 +62,7 @@ app.use('/post', postRoutes);
 //Routes for schedule 
 app.use("/schedule", scheduleRouter);
 
-
+app.use("/response", responseRouter);
 
 // Server setup
 const port = process.env.DB_PORT || 3000;  // Default port is 3000 if DB_PORT is not specified

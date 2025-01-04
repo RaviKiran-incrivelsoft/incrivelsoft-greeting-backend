@@ -49,10 +49,16 @@ const sendAutoMailsFromTemple = async () => {
                     console.log(`No users are found with birthday match with today associated temple Id:${templeData._id} `);
                 }
                 else {
+                    const responseArray = [];
                     for (const user of templeData.csvData) {
                         console.log(`found user with  birthday, today, ${user.email} `);
-                        await sendGreetings(template, user);
+                        const response = await sendGreetings(template, user);
+                        response.ref = id;
+                        responseArray.push(response);
+                        await delay(1000);
                     }
+                    const ids = await saveResponse(responseArray);
+                    await updateResponse(id, ids);
                 }
             }
             else {
@@ -90,4 +96,4 @@ const sendScheduledMailsFromTemple = async (id) => {
     }
 }
 
-export {sendScheduledMailsFromTemple, sendAutoMailsFromTemple};
+export { sendScheduledMailsFromTemple, sendAutoMailsFromTemple };

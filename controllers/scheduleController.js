@@ -58,7 +58,9 @@ const getSchedules = async (req, res) => {
     try {
         // Extract query parameters and convert to numbers
         const page = parseInt(req.query.page, 10) || 1;
-        const limit = parseInt(req.query.limit, 10) || 40
+        const limit = parseInt(req.query.limit, 10) || 40;
+        const scheduleStatus = req.query.status;
+        console.log("limit: ", limit, scheduleStatus);
         const skip = (page - 1) * limit;
 
         // Ensure the user is authenticated
@@ -67,35 +69,47 @@ const getSchedules = async (req, res) => {
             return res.status(401).send({ error: "Unauthorized access. User ID is required." });
         }
 
-        // Fetch schedules with pagination
-        const schedules = await scheduleSchema.find({ user: userId })
+        let schedules = [];
+        let totalSchedules = 0;
+
+        // Build the query condition
+        let queryCondition = { user: userId };
+        if (scheduleStatus !== "none") {
+            queryCondition = { $and: [{ user: userId }, { schedule: scheduleStatus }] };
+        }
+
+        // Fetch the schedules with pagination
+        schedules = await scheduleSchema.find(queryCondition)
+            .sort({ _id: -1 }) // Sort by most recent documents
             .skip(skip)
             .limit(limit)
-            .lean(); // Use .lean() for faster read operations
+            .lean();
+
+        // Get the total count
+        totalSchedules = await scheduleSchema.countDocuments(queryCondition);
 
         // Dynamically populate the non-null fields
-        const fields = ["temple", "birthday", "event", "festival", "marriage"];
+        const fieldsToPopulate = ["temple", "birthday", "event", "festival", "marriage"];
         for (const schedule of schedules) {
-            const fieldToPopulate = fields.find((field) => schedule[field]);
+            const fieldToPopulate = fieldsToPopulate.find((field) => schedule[field] != null);
             if (fieldToPopulate) {
                 await scheduleSchema.populate(schedule, { path: fieldToPopulate });
             }
         }
 
-        // Count total schedules
-        const totalSchedules = await scheduleSchema.countDocuments({ user: userId });
-
         // Respond with paginated data
         res.status(200).send({
             currentPage: page,
-            totalPages: Math.ceil(totalSchedules / limit),
+            totalSchedules,
             schedules,
         });
+
     } catch (error) {
-        console.error("Error in the getSchedules:", error);
-        res.status(500).send({ error: "Internal Server error..." });
+        console.error("Error in getSchedules:", error);
+        res.status(500).send({ error: "Internal Server error." });
     }
 };
+
 
 
 const deleteSchedule = async (req, res) => {
@@ -157,4 +171,48 @@ const scheduleByDefault = async (type, id, user) => {
     }
 }
 
-export { createSchedule, updateSchedule, getSchedules, deleteSchedule, fetchSchedules, scheduleByDefault };
+const getSchedulesByStatus = async (req, res) => {
+    try {
+        const { status } = req.params;
+        const page = parseInt(req.query.page, 10) || 1;
+        const limit = parseInt(req.query.limit, 10) || 40
+        const skip = (page - 1) * limit;
+
+        // Ensure the user is authenticated
+        const userId = req.user?.userId;
+        if (!userId) {
+            return res.status(401).send({ error: "Unauthorized access. User ID is required." });
+        }
+
+        // Fetch schedules with pagination
+        const schedules = await scheduleSchema.find({ $and: [{ user: userId }, { schedule: status }] })
+            .sort({ _id: -1 })
+            .skip(skip)
+            .limit(limit)
+            .lean(); // Use .lean() for faster read operations
+
+        // Dynamically populate the non-null fields
+        const fields = ["temple", "birthday", "event", "festival", "marriage"];
+        for (const schedule of schedules) {
+            const fieldToPopulate = fields.find((field) => schedule[field]);
+            if (fieldToPopulate) {
+                await scheduleSchema.populate(schedule, { path: fieldToPopulate });
+            }
+        }
+
+        // Count total schedules
+        const totalSchedules = await scheduleSchema.countDocuments({ $and: [{ user: userId }, { schedule: status }] });
+
+        // Respond with paginated data
+        res.status(200).send({
+            currentPage: page,
+            totalPages: Math.ceil(totalSchedules / limit),
+            schedules,
+        });
+
+    } catch (error) {
+        console.log("Error in the getSchedulesByStatus, ", error);
+        res.status(500).send({ error: "Internal Server error..." });
+    }
+}
+export { createSchedule, updateSchedule, getSchedules, getSchedulesByStatus, deleteSchedule, fetchSchedules, scheduleByDefault };

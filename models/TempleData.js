@@ -58,6 +58,16 @@ const dataSchema = new Schema({
 
 }, { timestamps: true });
 
+
+// Middleware to delete related csvData before removing a BirthDaysGreetings document
+dataSchema.pre('findOneAndDelete', async function (next) {
+    const docToDelete = await this.model.findOne(this.getFilter());
+    if (docToDelete && docToDelete.csvData.length > 0) {
+        await mongoose.model('CSVUsers').deleteMany({ _id: { $in: docToDelete.csvData } });
+    }
+    next();
+});
+
 const TempleDetailsModel = mongoose.model('TempleDetailsGreetings', dataSchema);
 
 export { TempleDetailsModel };

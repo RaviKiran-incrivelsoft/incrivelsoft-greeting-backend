@@ -6,6 +6,9 @@ const dataSchema = new Schema({
     email: {
         type: String,
     },
+    contact: {
+        type: String,
+    },
     success: {
         type: Boolean,
     },
