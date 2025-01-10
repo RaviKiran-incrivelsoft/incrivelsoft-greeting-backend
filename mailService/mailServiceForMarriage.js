@@ -1,23 +1,23 @@
 import calculateAge from "../utils/ageCalculator.js";
-import {transporter} from "../utils/transporterUtil.js";
+import { transporter } from "../utils/transporterUtil.js";
 
 const EMAIL = process.env.EMAIL;
 
 export default async function sendGreetings(template, userDetails) {
 
-    console.log("Sending the marriage email for ", userDetails.email);
+	console.log("Sending the marriage email for ", userDetails.email);
 
-    const age = calculateAge(userDetails.marriagedate);
-	
-    // Constructs an email object with the following details
-    const mailOptions = {
-        from: `Incrivelsoft Team ${EMAIL}`,
-        to: userDetails.email,
-        subject: template.title || "Happy Anniversary",
-        html: createEmailContent(template, userDetails, age)
-    };
+	const age = calculateAge(userDetails.marriagedate);
 
-    // Sends the email using transporter.sendMail and logs success or error messages
+	// Constructs an email object with the following details
+	const mailOptions = {
+		from: `Incrivelsoft Team ${EMAIL}`,
+		to: userDetails.email,
+		subject: template.title || "Happy Anniversary",
+		html: createEmailContent(template, userDetails, age)
+	};
+
+	// Sends the email using transporter.sendMail and logs success or error messages
 	try {
 		const info = await transporter.sendMail(mailOptions);
 		console.log("Email sent: ", info.response);
@@ -30,7 +30,7 @@ export default async function sendGreetings(template, userDetails) {
 
 /// Function to generate the HTML content of the email
 function createEmailContent(template, userDetails, age) {
-    const html = `
+	const html = `
         <!DOCTYPE html>
 <html lang="en">
 
@@ -47,9 +47,21 @@ function createEmailContent(template, userDetails, age) {
 		<!-- Image -->
 		<tr>
 			<td style="text-align: center;">
-				<img src=${template.banner || "https://res.cloudinary.com/dnl1wajhw/image/upload/v1735597028/anniversary_npxxyd.png"}
-					alt="Anniversary Image" style="width: 100%; max-width: 600px; height: auto; border-radius: 8px;">
-			</td>
+  ${template.banner
+			? template.banner.endsWith(".mp4") || template.banner.endsWith(".webm")
+				? `<video style="width: 100%; max-width: 600px; height: auto; border-radius: 8px;" controls>
+             <source src="${template.banner}" type="video/mp4">
+             Your browser does not support the video tag.
+           </video>`
+				: `<img src="${template.banner}" 
+               alt="Anniversary Banner" 
+               style="width: 100%; max-width: 600px; height: auto; border-radius: 8px;">`
+			: `<img src="https://res.cloudinary.com/dnl1wajhw/image/upload/v1735597028/anniversary_npxxyd.png" 
+               alt="Default Anniversary Banner" 
+               style="width: 100%; max-width: 600px; height: auto; border-radius: 8px;">`
+		}
+</td>
+
 		</tr>
 		<!-- Anniversary Title and Couple Names -->
 		<tr>
@@ -84,6 +96,6 @@ function createEmailContent(template, userDetails, age) {
 </html>
 `;
 
-    return html;
+	return html;
 }
 

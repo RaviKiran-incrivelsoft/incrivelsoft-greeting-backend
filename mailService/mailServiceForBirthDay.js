@@ -1,4 +1,4 @@
-import {transporter} from "../utils/transporterUtil.js";
+import { transporter } from "../utils/transporterUtil.js";
 import calculateAge from "../utils/ageCalculator.js";
 
 const EMAIL = process.env.EMAIL;
@@ -53,10 +53,23 @@ function createEmailContent(template, userDetails, age) {
 		</tr>
 		<!-- Image -->
 		<tr>
-			<td style="text-align: center; padding: 20px;">
-				<img src="${template.banner || 'https://cdn.templates.unlayer.com/assets/1676265088672-cake.png'}" alt="Birthday Cake" style="width: 70%; max-width: 300px; height: auto; border-radius: 8px;">
-			</td>
-		</tr>
+  <td style="text-align: center; padding: 20px;">
+    ${template.banner
+			? template.banner.endsWith(".mp4") || template.banner.endsWith(".webm")
+				? `<video style="width: 70%; max-width: 300px; height: auto; border-radius: 8px;" controls>
+               <source src="${template.banner}" type="video/mp4">
+               Your browser does not support the video tag.
+             </video>`
+				: `<img src="${template.banner}" 
+                 alt="Birthday Cake" 
+                 style="width: 70%; max-width: 300px; height: auto; border-radius: 8px;">`
+			: `<img src="https://cdn.templates.unlayer.com/assets/1676265088672-cake.png" 
+                 alt="Default Birthday Cake" 
+                 style="width: 70%; max-width: 300px; height: auto; border-radius: 8px;">`
+		}
+  </td>
+</tr>
+
 		<!-- Content -->
 		<tr>
 			<td style="padding: 20px; text-align: center; color: #bb395e;">

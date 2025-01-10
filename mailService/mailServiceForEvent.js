@@ -1,4 +1,4 @@
-import {transporter} from "../utils/transporterUtil.js";
+import { transporter } from "../utils/transporterUtil.js";
 
 const EMAIL = process.env.EMAIL;
 
@@ -50,9 +50,22 @@ function createEmailContent(template, userDetails) {
     </div>
 
     <!-- Image Section -->
-    <div style="text-align: center; padding: 10px;">
-      <img src=${template.banner || "https://tlr.stripocdn.email/content/guids/CABINET_b3ad24678cbb4d23876b91c37b9a8eb8/images/inviterafiki_1.png"} alt="Event Image" style="width: 100%; max-width: 500px; max-height: 300px; object-fit: contain; border-radius: 10px;" />
-    </div>
+   <div style="text-align: center; padding: 10px;">
+  ${template.banner
+      ? template.banner.endsWith(".mp4") || template.banner.endsWith(".webm")
+        ? `<video style="width: 100%; max-width: 500px; max-height: 300px; object-fit: contain; border-radius: 10px;" controls>
+             <source src="${template.banner}" type="video/mp4">
+             Your browser does not support the video tag.
+           </video>`
+        : `<img src="${template.banner}" 
+               alt="Event Image" 
+               style="width: 100%; max-width: 500px; max-height: 300px; object-fit: contain; border-radius: 10px;">`
+      : `<img src="https://tlr.stripocdn.email/content/guids/CABINET_b3ad24678cbb4d23876b91c37b9a8eb8/images/inviterafiki_1.png" 
+               alt="Default Event Image" 
+               style="width: 100%; max-width: 500px; max-height: 300px; object-fit: contain; border-radius: 10px;">`
+    }
+</div>
+
 
     <!-- Description Section -->
     <div style="text-align: center; font-size: 16px; color: #555555; margin: 20px; line-height: 1.6;">
@@ -61,9 +74,9 @@ function createEmailContent(template, userDetails) {
 
     <!-- Date and Time -->
     <div style="text-align: center; margin: 20px 0; display: flex; justify-content: center; align-items: center; font-size: 18px;">
-      <div style="color: #b49d80; font-weight: bold; margin: 0 10px;">${monthName}</div>
+      <div style="color: #b49d80; font-weight: bold; margin: 0 10px;"></div>
       <div style="width: 2px; height: 60px; background-color: #b49d80;"></div>
-      <div style="font-size: 48px; font-weight: bold; margin: 0 10px; color: #333333;">${day}</div>
+      <div style="font-size: 48px; font-weight: bold; margin: 0 10px; color: #333333;">${template.date}</div>
       <div style="width: 2px; height: 60px; background-color: #b49d80;"></div>
       <div style="color: #b49d80; font-weight: bold; margin: 0 10px;">5 PM</div>
     </div>
