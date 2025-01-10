@@ -11,6 +11,6 @@ templeRouter.post("/", authMiddleware, uploadMultipleFiles, createTemple);
 templeRouter.delete("/:id", authMiddleware, deleteTemple);
 templeRouter.get("/", authMiddleware, getAllTemples);
 templeRouter.get("/:id", authMiddleware, getTemple)
-templeRouter.put("./:id", authMiddleware, uploadMultipleFiles, updateTemple);
+templeRouter.put("/:id", authMiddleware, uploadMultipleFiles, updateTemple);
 
 export { templeRouter };
