@@ -64,7 +64,7 @@ const createEvent = async(req, res) => {
 
         await saveEvent.save();
 
-        await scheduleByDefault("event", saveEvent._id);
+        await scheduleByDefault("event", saveEvent._id, user);
 
         res.status(201).send({saveEvent});
 
