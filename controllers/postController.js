@@ -19,9 +19,32 @@ const createPost = async (req, res) => {
 		const result = await cloudinary.uploader.upload(req.file.path, {
 			resource_type: req.file.mimetype.startsWith("video") ? "video" : "image",
 		});
+		let mediaURL = result.secure_url;
 
-		const mediaURL = result.secure_url;
-		const newPost = new PostModel({ postDescription, postName, userId, mediaURL, type: type || null, isGlobal: false, });
+		if (req.file.mimetype.startsWith("video")) {
+			const publicId = result.public_id;
+
+			mediaURL = cloudinary.url(publicId, {
+				resource_type: "video",
+				format: "gif",
+				transformation: [
+					{ width: 600, crop: "scale" },
+					{ fps: 15 },
+					{ duration: 5 },
+					{ effect: "loop" }
+				],
+			});
+		}
+
+		const newPost = new PostModel({
+			postDescription,
+			postName,
+			userId,
+			mediaURL,
+			type: type || null,
+			isGlobal: false,
+		});
+
 		const savedPost = await newPost.save();
 		res.status(201).json(savedPost);
 	} catch (err) {

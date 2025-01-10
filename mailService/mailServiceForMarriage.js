@@ -47,18 +47,13 @@ function createEmailContent(template, userDetails, age) {
 		<!-- Image -->
 		<tr>
 			<td style="text-align: center;">
-  ${template.banner
-			? template.banner.endsWith(".mp4") || template.banner.endsWith(".webm")
-				? `<video style="width: 100%; max-width: 600px; height: auto; border-radius: 8px;" controls>
-             <source src="${template.banner}" type="video/mp4">
-             Your browser does not support the video tag.
-           </video>`
-				: `<img src="${template.banner}" 
-               alt="Anniversary Banner" 
-               style="width: 100%; max-width: 600px; height: auto; border-radius: 8px;">`
-			: `<img src="https://res.cloudinary.com/dnl1wajhw/image/upload/v1735597028/anniversary_npxxyd.png" 
-               alt="Default Anniversary Banner" 
-               style="width: 100%; max-width: 600px; height: auto; border-radius: 8px;">`
+			${template.banner && (template.banner.endsWith(".gif") || template.banner.endsWith(".png") || template.banner.endsWith(".jpg") || template.banner.endsWith(".jpeg"))
+			? `<img src="${template.banner}" 
+							alt="Banner Image" 
+							style="width: 70%; max-width: 300px; height: auto; border-radius: 8px;">`
+			: `<img src="https://cdn.templates.unlayer.com/assets/1676265088672-cake.png" 
+							alt="Default Birthday Cake" 
+							style="width: 70%; max-width: 300px; height: auto; border-radius: 8px;">`
 		}
 </td>
 

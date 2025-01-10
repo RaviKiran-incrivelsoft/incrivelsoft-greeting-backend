@@ -44,22 +44,17 @@ function createEmailContent(template, userDetails) {
                             <table width="100%" border="0" cellpadding="0" cellspacing="0">
                                 <tbody>
                                     <tr>
-  <td align="center">
-    ${template.templeBanner
-            ? template.templeBanner.endsWith(".mp4") || template.templeBanner.endsWith(".webm")
-                ? `<video style="width: 100%; max-width: 600px; height: auto; border-radius: 8px;" controls>
-               <source src="${template.templeBanner}" type="video/mp4">
-               Your browser does not support the video tag.
-             </video>`
-                : `<img src="${template.templeBanner}" 
-                 alt="Temple Banner" 
-                 style="width: 100%; max-width: 600px; height: auto; border-radius: 8px;">`
-            : `<img src="https://via.placeholder.com/600x300.png?text=Default+Temple+Banner" 
-                 alt="Default Temple Banner" 
-                 style="width: 100%; max-width: 600px; height: auto; border-radius: 8px;">`
-        }
-  </td>
-</tr>
+                            <td align="center">
+                                ${template.banner && (template.banner.endsWith(".gif") || template.banner.endsWith(".png") || template.banner.endsWith(".jpg") || template.banner.endsWith(".jpeg"))
+                                ? `<img src="${template.banner}" 
+                                    alt="Banner Image" 
+                                    style="width: 70%; max-width: 300px; height: auto; border-radius: 8px;">`
+                                : `<img src="https://cdn.templates.unlayer.com/assets/1676265088672-cake.png" 
+                                    alt="Default Birthday Cake" 
+                                    style="width: 70%; max-width: 300px; height: auto; border-radius: 8px;">`
+                                }
+                            </td>
+                            </tr>
 
                                 </tbody>
                             </table>

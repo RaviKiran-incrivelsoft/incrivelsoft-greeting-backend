@@ -50,33 +50,25 @@ function createEmailContent(template, userDetails) {
     </div>
 
     <!-- Image Section -->
-   <div style="text-align: center; padding: 10px;">
-  ${template.banner
-      ? template.banner.endsWith(".mp4") || template.banner.endsWith(".webm")
-        ? `<video style="width: 100%; max-width: 500px; max-height: 300px; object-fit: contain; border-radius: 10px;" controls>
-             <source src="${template.banner}" type="video/mp4">
-             Your browser does not support the video tag.
-           </video>`
-        : `<img src="${template.banner}" 
-               alt="Event Image" 
-               style="width: 100%; max-width: 500px; max-height: 300px; object-fit: contain; border-radius: 10px;">`
-      : `<img src="https://tlr.stripocdn.email/content/guids/CABINET_b3ad24678cbb4d23876b91c37b9a8eb8/images/inviterafiki_1.png" 
-               alt="Default Event Image" 
-               style="width: 100%; max-width: 500px; max-height: 300px; object-fit: contain; border-radius: 10px;">`
-    }
-</div>
-
-
-    <!-- Description Section -->
+    <div style="text-align: center; padding: 10px;">
+      ${template.banner && (template.banner.endsWith(".gif") || template.banner.endsWith(".png") || template.banner.endsWith(".jpg") || template.banner.endsWith(".jpeg"))
+        ? `<img src="${template.banner}" 
+            alt="Banner Image" 
+            style="width: 70%; max-width: 300px; height: auto; border-radius: 8px;">`
+        : `<img src="https://cdn.templates.unlayer.com/assets/1676265088672-cake.png" 
+            alt="Default Birthday Cake" 
+            style="width: 70%; max-width: 300px; height: auto; border-radius: 8px;">`
+      }
+  </div>
     <div style="text-align: center; font-size: 16px; color: #555555; margin: 20px; line-height: 1.6;">
       ${template.description || "Welcome to our special event! Customize this message to include details about the occasion, such as what to expect, activities planned, or any important information. Make it personal and engaging!"}
       </div>
 
     <!-- Date and Time -->
     <div style="text-align: center; margin: 20px 0; display: flex; justify-content: center; align-items: center; font-size: 18px;">
-      <div style="color: #b49d80; font-weight: bold; margin: 0 10px;"></div>
+      <div style="color: #b49d80; font-weight: bold; margin: 0 10px;">${new Date(template.date).getDate()}</div>
       <div style="width: 2px; height: 60px; background-color: #b49d80;"></div>
-      <div style="font-size: 48px; font-weight: bold; margin: 0 10px; color: #333333;">${template.date}</div>
+      <div style="font-size: 40px; font-weight: bold; margin: 0 10px; color: #333333;">${new Intl.DateTimeFormat("en-US", { month: "short" }).format(new Date(template.date))}</div>
       <div style="width: 2px; height: 60px; background-color: #b49d80;"></div>
       <div style="color: #b49d80; font-weight: bold; margin: 0 10px;">5 PM</div>
     </div>
