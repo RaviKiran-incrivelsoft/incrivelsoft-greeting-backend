@@ -129,11 +129,11 @@ const updateBirthDayDetails = async(req, res) => {
         });
         if(csvData && csvData.length > 0)
         {
-            const birthdateDetails = await BirthDayModel.findById(id);
-            fieldsToUpdate.csvData = await saveUsersWithBirthDay(fieldsToUpdate, birthdateDetails._id);
+            const ids = await saveUsersWithBirthDay(csvData); // Save users to DB
+            fieldsToUpdate.csvData = ids;
         }
-        const updateMarriageDetails = await BirthDayModel.findByIdAndUpdate(id, fieldsToUpdate, {new: true, runValidators: true});
-        res.status(200).send({updateMarriageDetails});
+        const updatedPost = await BirthDayModel.findByIdAndUpdate(id, fieldsToUpdate, {new: true, runValidators: true});
+        res.status(200).send({updatedPost});
     } catch (error) {
         console.log("Error in the updateBirthDayDetails, ", error);
         res.status(500).send({error: "Internal server error..."});

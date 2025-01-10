@@ -111,7 +111,7 @@ const updateMarriageDetails = async (req, res) => {
         });
         if (csvData.length > 0) {
             const existingMarriageDetails = await MarriageModel.findById(id);
-            updateMarriageDetails.csvData = await saveCouples(csvData, existingMarriageDetails._id);
+            fieldsToUpdate.csvData = await saveCouples(csvData, existingMarriageDetails._id);
         }
         const updateMarriageDetails = await MarriageModel.findByIdAndUpdate(id, fieldsToUpdate, { new: true, runValidators: true });
         res.status(200).send({ updateMarriageDetails });

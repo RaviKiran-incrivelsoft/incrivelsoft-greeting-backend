@@ -1,7 +1,7 @@
 import { TempleDetailsModel } from "../models/TempleData.js";
 import { saveUsersWithBirthDay } from "./csvUserController.js";
 import cloudinary from "../cloudinary/config.js";
-import {scheduleByDefault} from "./scheduleController.js"
+import { scheduleByDefault } from "./scheduleController.js"
 
 
 const getTempleData = async (templeId, targetDate = null) => {
@@ -79,8 +79,7 @@ const createTemple = async (req, res) => {
             }
         });
 
-        if(csvData === undefined || csvData.length === 0)
-        {
+        if (csvData === undefined || csvData.length === 0) {
             missingFields.push(csvData);
         }
 
@@ -110,7 +109,7 @@ const createTemple = async (req, res) => {
         // Save temple data
         const newTemple = new TempleDetailsModel(templeData);
         await newTemple.save();
-         
+
         newTemple.csvData = await saveUsersWithBirthDay(csvData, newTemple._id);
 
         await newTemple.save();
@@ -144,6 +143,10 @@ const deleteTemple = async (req, res) => {
 const updateTemple = async (req, res) => {
     try {
         const { id } = req.params;
+        const templeData = await TempleDetailsModel.findById(id);
+        if (!templeData) {
+            return res.status(404).send({ error: `Temple not found with id:  ${id}.` });
+        }
         const {
             templeName,
             instagramUrl,
@@ -177,19 +180,24 @@ const updateTemple = async (req, res) => {
             }
         });
 
-        if (req.files && req.files[zelleQrCode]) {
+        if (req.files && req.files?.zelleQrCode) {
             const zelleQrCodeURL = await cloudinary.uploader.upload(req.files.zelleQrCode[0].path);
             fieldsToUpdate.zelleQrCodeURL = zelleQrCodeURL.secure_url
         }
-        if (req.files && req.files[paypalQrCode]) {
+        if (req.files && req.files?.paypalQrCode) {
             const paypalQrCodeURL = await cloudinary.uploader.upload(req.files.paypalQrCode[0].path);
             fieldsToUpdate.paypalQrCodeURL = paypalQrCodeURL.secure_url
         }
-        if (csvData.length > 0) {
+        if (csvData?.length > 0) {
             const ids = await saveUsersWithBirthDay(csvData); // Save users to DB
             fieldsToUpdate.csvData = ids;
         }
+        
         const updatedPost = await TempleDetailsModel.findByIdAndUpdate(id, fieldsToUpdate, { new: true, runValidators: true });
+        
+        if (!updatedPost) {
+            return res.status(404).send({ error: "Post not found" });
+        }
         res.status(200).send({ updatedPost });
 
     } catch (error) {
@@ -227,11 +235,10 @@ const getAllTemples = async (req, res) => {
     }
 }
 
-const updateResponse = async(id, data) => {
+const updateResponse = async (id, data) => {
     try {
         const updateResponse = await TempleDetailsModel.findById(id);
-        if(!updateResponse)
-        {
+        if (!updateResponse) {
             throw new Error(`birthday Details is exists with id: ${id}`);
         }
         updateResponse.response.push(...data);
