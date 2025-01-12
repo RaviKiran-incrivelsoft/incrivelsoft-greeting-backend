@@ -98,15 +98,16 @@ const getAllFestivalDetails = async (req, res) => {
 
 const updateFestivalDetails = async (req, res) => {
     try {
+        const {id} = req.params;
         const { festivalName, festivalDate, from, csvData, address, postDetails } = req.body;
-        const fieldsToUpdate = { festivalName, festivalDate, from, address, postDetails };
+        const fieldsToUpdate = { festivalName, festivalDate, csvData, from, address, postDetails };
         Object.keys(fieldsToUpdate).forEach((key) => {
             if (fieldsToUpdate[key] === undefined) {
                 delete fieldsToUpdate[key]
             }
         });
 
-        if (fieldsToUpdate.csvData.length !== 0) {
+        if (csvData?.length !== 0) {
             const existingFestivalDetails = await FestivalSchema.findById(id);
             const ids = await saveUsers(csvData, existingFestivalDetails._id);
             fieldsToUpdate.csvData = ids;
