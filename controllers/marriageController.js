@@ -109,7 +109,8 @@ const updateMarriageDetails = async (req, res) => {
                 delete fieldsToUpdate[key]
             }
         });
-        if (csvData.length > 0) {
+        
+        if (csvData?.length > 0) {
             const existingMarriageDetails = await MarriageModel.findById(id);
             fieldsToUpdate.csvData = await saveCouples(csvData, existingMarriageDetails._id);
         }

@@ -113,7 +113,7 @@ const updateEventDetails = async(req, res) => {
                 delete fieldsToUpdate[key]
             }
         });
-        if(csvData.length !== 0)
+        if(csvData?.length !== 0)
         {
             const existingEventDetails = await EventSchema.findById(id);
             const ids = await saveUsers(csvData, existingEventDetails._id);

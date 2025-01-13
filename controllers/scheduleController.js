@@ -60,7 +60,7 @@ const getSchedules = async (req, res) => {
         const page = parseInt(req.query.page, 10) || 1;
         const limit = parseInt(req.query.limit, 10) || 40;
         const scheduleStatus = req.query.status;
-        console.log("limit: ", limit, scheduleStatus);
+        // console.log("limit: ", limit, scheduleStatus);
         const skip = (page - 1) * limit;
 
         // Ensure the user is authenticated
