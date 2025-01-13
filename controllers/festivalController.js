@@ -57,7 +57,9 @@ const createFestival = async (req, res) => {
         const createFestival = new FestivalSchema(requiredFields);
         await createFestival.save();
 
-        createFestival.csvData = await saveUsers(csvData, createFestival._id);
+        if (csvData?.length !== 0) {
+            createFestival.csvData = await saveUsers(csvData, createFestival._id);
+        }
 
         await createFestival.save();
 

@@ -48,7 +48,7 @@ const saveUsers = async (data, ref) => {
             csvData = data;
         }
         else{
-            csvData = JSON.parse(data);
+            csvData = JSON?.parse(data);
         }
         if (!Array.isArray(csvData)) {
             throw new Error("Expected an array of users but received: " + typeof csvData);

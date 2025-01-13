@@ -60,7 +60,9 @@ const createEvent = async(req, res) => {
         const saveEvent = new EventSchema(requiredFields);
         await saveEvent.save();
 
-        saveEvent.csvData = await saveUsers(csvData, saveEvent._id, user);
+        if (csvData?.length !== 0) {
+            saveEvent.csvData = await saveUsers(csvData, saveEvent._id);
+        }
 
         await saveEvent.save();
 
