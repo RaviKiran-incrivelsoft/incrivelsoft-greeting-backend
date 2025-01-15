@@ -1,3 +1,4 @@
+import Analytics from "../models/AnalyticsModel.js";
 import { scheduleSchema } from "../models/Schedule.js";
 
 const createSchedule = async (req, res) => {
@@ -47,6 +48,32 @@ const updateSchedule = async (req, res) => {
         if (!updateSchedule) {
             return res.status(404).send({ error: `Schedule is not found with id: ${id}` });
         }
+
+        const scheduleType = fieldsToUpdate.schedule;
+        let scheduleCategory = null;
+
+        const scheduleCategories = ["temple", "marriage", "festival", "event", "birthday"];
+        scheduleCategories.forEach((category) => {
+            if (fieldsToUpdate[category]) {
+                scheduleCategory = category;
+            }
+        });
+        
+        if (scheduleType && scheduleCategory) {
+            const analyticsUpdate = {};
+
+            // Increment for the new schedule type
+            analyticsUpdate[`schedules.${scheduleCategory}.${scheduleType}`] =
+                (analyticsUpdate[`schedules.${scheduleCategory}.${scheduleType}`] || 0) + 1;
+
+            // Update analytics schema
+            await Analytics.findOneAndUpdate(
+                { user: existingSchedule.user },
+                { $inc: analyticsUpdate },
+                { new: true }
+            );
+        }
+
         return res.status(200).send({ message: "Schedule is updated...", updateSchedule })
     } catch (error) {
         console.log("Error in the updateSchedule, ", error);
@@ -165,6 +192,14 @@ const scheduleByDefault = async (type, id, user) => {
         else {
             throw new Error("Invalid Reference..")
         }
+        const updateField = {
+            $inc: {
+                [`schedules.${type}.pause`]: 1,
+                [`media.${type}.email.pending`]: 1,
+            },
+        };
+
+        await Analytics.findOneAndUpdate({ user }, updateField, { new: true, upsert: true });
 
     } catch (error) {
         console.log("Error in the scheduleByDefault, ", error);

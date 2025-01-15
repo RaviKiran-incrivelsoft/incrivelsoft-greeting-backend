@@ -1,4 +1,5 @@
 import cloudinary from '../cloudinary/config.js';
+import Analytics from '../models/AnalyticsModel.js';
 import PostModel from '../models/PostModel.js';
 
 // Create a new post
@@ -46,6 +47,15 @@ const createPost = async (req, res) => {
 		});
 
 		const savedPost = await newPost.save();
+
+		if (type) {
+			await Analytics.findOneAndUpdate(
+				{ user: userId },
+				{ $inc: { [`templatesCreated.${type}`]: 1 } },
+				{ upsert: true }
+			);
+		}
+
 		res.status(201).json(savedPost);
 	} catch (err) {
 		console.log("Error in the createPost, ", err)
@@ -120,6 +130,13 @@ const deletePost = async (req, res) => {
 		const deletedPost = await PostModel.findByIdAndDelete(req.params.id);
 		if (!deletedPost) {
 			return res.status(404).json({ message: 'Post not found' });
+		}
+		if (deletedPost.type) {
+			await Analytics.findOneAndUpdate(
+				{ user: deletedPost.userId },
+				{ $inc: { [`templatesCreated.${deletedPost.type}`]: -1 } },
+				{ upsert: true }
+			);
 		}
 		res.json({ message: 'Post deleted successfully' });
 	} catch (err) {

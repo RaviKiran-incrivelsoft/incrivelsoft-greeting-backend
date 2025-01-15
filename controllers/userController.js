@@ -1,6 +1,7 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
+import Analytics from '../models/AnalyticsModel.js';
 
 // Create a new user
 export const createUser = async (req, res) => {
@@ -11,20 +12,20 @@ export const createUser = async (req, res) => {
 		if (existingUser) {
 			return res.status(400).json({ message: 'Email already in use' });
 		}
-		if(confirm_password !== password) {
-			return res.status(400).send({message: "Passwords are not matched..."});
+		if (confirm_password !== password) {
+			return res.status(400).send({ message: "Passwords are not matched..." });
 		}
 
 		const requiredFields = { first_name, last_name, email, password };
 		const missingFields = [];
 		Object.keys(requiredFields).forEach((key) => {
-			if(requiredFields[key] === undefined) {
+			if (requiredFields[key] === undefined) {
 				missingFields.push(key);
 			}
 		});
 
-		if(missingFields.length !== 0) {
-			return res.status(400).send({message: `${missingFields} are required...`});
+		if (missingFields.length !== 0) {
+			return res.status(400).send({ message: `${missingFields} are required...` });
 		}
 
 		const user = new User({
@@ -35,6 +36,13 @@ export const createUser = async (req, res) => {
 		});
 
 		await user.save();
+
+		const analytics = new Analytics({
+			user: user._id,
+		});
+
+		await analytics.save();
+
 		res.status(201).json({ message: 'User created successfully!' });
 	} catch (err) {
 		res.status(500).json({ message: err.message });
@@ -73,12 +81,12 @@ export const loginUser = async (req, res) => {
 // Get all users
 export const getAllUsers = async (req, res) => {
 	try {
-		const {page=1, limit=10} = req.query;
+		const { page = 1, limit = 10 } = req.query;
 		const skip = (page - 1) * limit;
 		const users = await User.find().select('-password').skip(skip).limit(limit);
 		const totalUsers = await User.countDocuments();
-	
-		res.status(200).send({totalPages: Math.ceil(totalUsers/limit), currentPage: page,  users});
+
+		res.status(200).send({ totalPages: Math.ceil(totalUsers / limit), currentPage: page, users });
 	} catch (err) {
 		res.status(500).json({ message: err.message });
 	}
@@ -123,6 +131,7 @@ export const deleteUser = async (req, res) => {
 		if (!deletedUser) {
 			return res.status(404).json({ message: 'User not found' });
 		}
+		await Analytics.findOneAndDelete({ user: req.params.id });
 		res.json({ message: 'User deleted successfully' });
 	} catch (err) {
 		res.status(500).json({ message: err.message });
