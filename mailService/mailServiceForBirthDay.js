@@ -53,7 +53,7 @@ function createEmailContent(template, userDetails, age) {
 				<!-- Image -->
 				<tr>
 					<td style="text-align: center; padding: 20px;">
-						${template.banner && (template.banner.endsWith(".gif") || template.banner.endsWith(".png") || template.banner.endsWith(".jpg") || template.banner.endsWith(".jpeg"))
+						${template.banner && (template.banner.includes(".gif") || template.banner.includes(".png") || template.banner.includes(".jpg") || template.banner.includes(".jpeg"))
 							? `<img src="${template.banner}" 
 							alt="Banner Image" 
 							style="width: 70%; max-width: 300px; height: auto; border-radius: 8px;">`

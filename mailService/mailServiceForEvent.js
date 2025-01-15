@@ -51,13 +51,10 @@ function createEmailContent(template, userDetails) {
 
     <!-- Image Section -->
     <div style="text-align: center; padding: 10px;">
-      ${template.banner && (template.banner.endsWith(".gif") || template.banner.endsWith(".png") || template.banner.endsWith(".jpg") || template.banner.endsWith(".jpeg"))
+      ${template.banner && (template.banner.includes(".gif") || template.banner.includes(".png") || template.banner.includes(".jpg") || template.banner.includes(".jpeg"))
         ? `<img src="${template.banner}" 
-            alt="Banner Image" 
-            style="width: 70%; max-width: 300px; height: auto; border-radius: 8px;">`
-        : `<img src="https://cdn.templates.unlayer.com/assets/1676265088672-cake.png" 
-            alt="Default Birthday Cake" 
-            style="width: 70%; max-width: 300px; height: auto; border-radius: 8px;">`
+            alt="Event Image" style="width: 100%; max-width: 500px; max-height: 300px; object-fit: contain; border-radius: 10px;" />`
+        : `<img src="https://tlr.stripocdn.email/content/guids/CABINET_b3ad24678cbb4d23876b91c37b9a8eb8/images/inviterafiki_1.png" alt="Event Image" style="width: 100%; max-width: 500px; max-height: 300px; object-fit: contain; border-radius: 10px;" />`
       }
   </div>
     <div style="text-align: center; font-size: 16px; color: #555555; margin: 20px; line-height: 1.6;">

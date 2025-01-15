@@ -47,13 +47,11 @@ function createEmailContent(template, userDetails, age) {
 		<!-- Image -->
 		<tr>
 			<td style="text-align: center;">
-			${template.banner && (template.banner.endsWith(".gif") || template.banner.endsWith(".png") || template.banner.endsWith(".jpg") || template.banner.endsWith(".jpeg"))
+			${template.banner && (template.banner.includes(".gif") || template.banner.includes(".png") || template.banner.includes(".jpg") || template.banner.includes(".jpeg"))
 			? `<img src="${template.banner}" 
-							alt="Banner Image" 
-							style="width: 70%; max-width: 300px; height: auto; border-radius: 8px;">`
-			: `<img src="https://cdn.templates.unlayer.com/assets/1676265088672-cake.png" 
-							alt="Default Birthday Cake" 
-							style="width: 70%; max-width: 300px; height: auto; border-radius: 8px;">`
+					alt="Anniversary Image" style="width: 100%; max-width: 600px; height: auto; border-radius: 8px;">`
+			: `<img src="https://res.cloudinary.com/dnl1wajhw/image/upload/v1735597028/anniversary_npxxyd.png"
+					alt="Anniversary Image" style="width: 100%; max-width: 600px; height: auto; border-radius: 8px;">`
 		}
 </td>
 
