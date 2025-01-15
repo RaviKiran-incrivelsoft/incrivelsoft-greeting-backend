@@ -38,7 +38,7 @@ function createEmailContent(template, userDetails, age) {
 			<meta charset="UTF-8">
 			<meta name="viewport" content="width=device-width, initial-scale=1.0">
 			<meta http-equiv="X-UA-Compatible" content="IE=edge">
-			<title>Happy Birthday ${userDetails.first_name || "Ravi"} ${userDetails.last_name || "kiran"}</title>
+			<title>Happy Birthday ${userDetails?.first_name || ""} ${userDetails?.last_name || ""}</title>
 		</head>
 
 		<body style="margin: 0; padding: 0; font-family: 'Open Sans', sans-serif;">
@@ -46,7 +46,7 @@ function createEmailContent(template, userDetails, age) {
 				<!-- Header -->
 				<tr>
 					<td style="background-color: #bb395e; color: #ffffff; text-align: center; padding: 30px;">
-						<h1 style="margin: 0; font-size: 36px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);">Happy ${age || "18"}th Birthday, ${userDetails.first_name || "Ravi"} ${userDetails.last_name || "Kiran"}!</h1>
+						<h1 style="margin: 0; font-size: 36px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);">Happy ${age || "18"}th Birthday, ${userDetails?.first_name || ""} ${userDetails?.last_name || ""}!</h1>
 						<p style="margin: 5px 0 0; font-size: 20px; font-weight: 300; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);">Wishing you a day filled with love and joy!</p>
 					</td>
 				</tr>

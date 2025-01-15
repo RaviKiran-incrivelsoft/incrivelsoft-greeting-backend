@@ -65,10 +65,10 @@ function createEmailContent(template, userDetails, age) {
 
 				<p
 					style="font-size: 24px; margin: 20px 0; text-align: center; font-weight: normal; color: #444; line-height: 1.6;">
-					<span style="font-size: 50px; font-family: 'Brush Script MT', cursive; color: #d4757e;">${userDetails.husband_name || "Mohan"}</span>
+					<span style="font-size: 50px; font-family: 'Brush Script MT', cursive; color: #d4757e;">${userDetails?.husband_name || ""}</span>
 					<span
 						style="font-size: 40px; font-family: 'Brush Script MT', cursive; font-weight: normal; color: #ffc6cc; margin: 0 15px;">&</span>
-					<span style="font-size: 50px; font-family: 'Brush Script MT', cursive; color: #d4757e;">${userDetails.wife_name || "Rasmika"}</span>
+					<span style="font-size: 50px; font-family: 'Brush Script MT', cursive; color: #d4757e;">${userDetails?.wife_name || ""}</span>
 				</p>
 				<p style="font-size: 20px; line-height: 1.5; margin: 10px 100px;">Celebrating the Love of <span
 						style="color: #ff909b;">${age || "10"}</span> of Wonderful Years Together</p>
